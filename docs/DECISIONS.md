@@ -51,6 +51,15 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Resolved (2026-11-18): destination repository `https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-`, base branch `main`, review-branch workflow with authenticated push from the Arena session. No force-push.
 - Open: Windows versus macOS, CPU architecture, RAM/storage for the build host.
 
+## D009 — ROM source direction: RestlessOS GSI (owner-directed, confirmation pending)
+
+- Date: 2026-11-18
+- Status: **Proposed by owner; conflicts with D002 — explicit confirmation requested before it becomes the accepted direction**
+- Direction: use `cawilliamson/treble_restlessos` (unofficial GrapheneOS-fork **GSI**, branch `android-17.0`) as the ROM source instead of a device-specific LineageOS tree; kernel from `poqdavid/android_kernel_samsung_sma155f` `main` (stock-optimized, no root).
+- Conflict: D002 requires "device-specific, LineageOS-based… not merely another GSI". A GSI keeps the stock vendor/kernel stack and cannot deliver the device-specific integration, firmware/kernel update control, or verified-boot ownership that D002/D008's security posture implies. Upstream RestlessOS itself states it makes no security guarantees.
+- Compatibility notes: sandboxed-Play requirement (D002) remains satisfiable — GrapheneOS's GmsCompat ships in the RestlessOS lineage. Drivers/HALs come from the stock vendor partition; the kernel must stay firmware-matched (user baseline CYG3; kernel releases target CYG1/CYG4 → repack against the user's CYG3 `boot.img`).
+- If confirmed: D002 will be amended (GSI-based GrapheneOS-fork direction), ROADMAP phases re-scoped accordingly, and the security-claims wording in README kept as-is or strengthened.
+
 ## D008 — Release security, licensing, and branding
 
 - Date: 2026-11-16; updated 2026-11-18

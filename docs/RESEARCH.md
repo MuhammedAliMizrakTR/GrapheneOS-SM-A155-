@@ -61,6 +61,27 @@ Initial inspection date: **2026-11-16**. These are public-source observations an
 - This describes that tool lookup, not a permanent statement that GitHub can never be accessed by another authorized mechanism or in a later chat.
 - No destination repository, authenticated Git remote, API call, PR, or remote push was established at the initial checkpoint.
 
+## R008 — Kernel repository hands-on verification (2026-11-18)
+
+- Repository cloned (`main` branch, depth 1): ~3.9 GB working tree, ~93k files.
+- Branch/variant map confirmed from README and `.github/workflows/build.yml`: `main` = **stock optimized, no root** (release prefix `STOCK_OPTIMIZED_`); `kernelsu`, `kernelsunext`, `kernelsunext-lkm`, `bakasu`/`resukisu` = root-oriented variants. The no-root `main` branch matches this project's stated goal (RESEARCH R002: root is not required).
+- Kernel content: `kernel-5.10/` imported from Samsung Open Source drops (latest import commit references `SM-A155F_15_Opensource_A155FXXS7CYG4`); GKI `android12-5.10`, KMI generation 9; defconfig `a15_00_defconfig` (+`entry_level.config` overlay).
+- Build is **hermetic**: bundled prebuilts provide clang-r416183b (`prebuilts-master/clang`), AOSP build-tools (bison/flex/bc/m4/make…), `magiskboot`/`avbtool` (`scripts/bin`). System packages listed in the README are largely redundant with the hermetic path.
+- Build entry points: `./build.sh -j N` (stock) then `./scripts/repack` (repacks `repackfiles/boot.img.lz4`, **re-signs with a freshly generated AVB key** → requires unlocked bootloader; not stock-signed).
+- **Firmware mismatch confirmed:** release tags target `A155FXXS7CYG1`/`CYG4`; user baseline is `CYG3`. For a firmware-matched repack, the user's **CYG3 stock `boot.img`** (from the AP package) must replace `repackfiles/boot.img.lz4`.
+- Sandbox build findings (2026-11-18): build starts and compiles with the bundled toolchain on a 2-CPU/3.8 GB Debian 12 container. Two environment issues found and worked around locally: (1) `raw.githubusercontent.com` blocked → Baseband-Guard `setup.sh` fetched via the GitHub API instead (script itself clones via `github.com`, which works); (2) distro `mawk` lacks gawk's 3-arg `match()` used by BBG's informational `show_config_lsm_notice` → notice stubbed; the functional steps (clone/symlink/Makefile/Kconfig) succeed. Build result pending at documentation time — see PROJECT_STATE.md.
+- Not yet established: completed build artifact, boot on device, or module/vendor compatibility with CYG3.
+
+## R009 — RestlessOS evaluation (owner-proposed ROM source, 2026-11-18)
+
+- Repository: https://github.com/cawilliamson/treble_restlessos — branch `android-17.0` (active; last commit 2026-11-17), 72 releases, latest observed `17.0.0-202611021750` (2026-11-02).
+- **What it is:** unofficial, unaffiliated GrapheneOS fork packaged as a **Generic System Image (GSI)** on a TrebleDroid base. This conflicts with D002's "device-specific, not merely a GSI" — recorded as owner-directed scope change in D009, pending confirmation.
+- Upstream's own security posture matches this project's truthfulness requirements: explicitly "no security guarantees"; a GSI cannot provide firmware/kernel/HAL updates, GrapheneOS kernel hardening, hardware attestation, or verified-boot control. Removed features include hardened_malloc (39-bit VA boot loops), Auditor, mtectrl, USB port protection; some hardening disabled by default for vendor-driver compatibility (re-enableable in TrebleApp).
+- MediaTek BPF bug (ALPS05247589) affects vendor kernels 4.14/4.19 — **not applicable** to this device's 5.10 kernel.
+- Build: **no supported local build path** — the GitHub Actions pipeline (`.github/workflows/build.yml`) provisions EC2 spot instances, syncs GrapheneOS manifests, applies patches, builds, signs (private `vendor_cawilliamson-priv` key repo; reference scripts in public `vendor_cawilliamson_keys`), and releases. A fork could run the same pipeline; owner GitHub Actions usage/costs and key custody need consideration.
+- Drivers answer for the GSI approach: HALs/drivers come from the **stock vendor partition** (Treble architecture) — no blob extraction needed for basic bring-up, but the vendor/ODm stack must stay firmware-matched (CYG3), and the kernel must remain module-compatible with it.
+- Sandboxed Play: GrapheneOS's GmsCompat is part of the upstream feature set a RestlessOS image inherits; exact behavior/configuration on this device still requires on-device validation (Phase 4).
+
 ## Open research questions
 
 - Exact live device/firmware/partition/boot layout and matched kernel/module inventory.

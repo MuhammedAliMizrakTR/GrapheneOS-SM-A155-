@@ -2,6 +2,37 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 (session 2) — Kernel/ROM sources selected; first sandbox kernel build attempted
+
+### Changed
+
+- Owner selected sources: kernel `poqdavid/android_kernel_samsung_sma155f` (`main`, stock-optimized no-root), ROM `cawilliamson/treble_restlessos` (RestlessOS GSI, `android-17.0`).
+- `docs/RESEARCH.md`: added R008 (kernel repo hands-on verification) and R009 (RestlessOS evaluation, incl. its GSI trust model and CI-only build pipeline).
+- `docs/DECISIONS.md`: added D009 (owner-directed GSI direction; conflicts with D002 — confirmation pending).
+- `PROJECT_STATE.md`: refreshed; PR #1 merged to `main` (`cee1d02`); new session branch `arena/76b5d892-grapheneos-sm-a155`.
+
+### Evidence / validation
+
+- Kernel repo cloned and inspected (branch map, hermetic toolchain, build/repack flow); findings in R008.
+- Kernel build started in this sandbox (stock variant, `-j2`); environment fixes: BBG `setup.sh` fetched via GitHub API (`raw.githubusercontent.com` unreachable), gawk-only notice stubbed for `mawk`. **Build outcome pending at commit time — see PROJECT_STATE.md; no success is claimed yet.**
+- No firmware extraction, device test, or RestlessOS build has run.
+
+### Known failures / open items
+
+- D009 needs explicit owner confirmation (GSI vs device-specific LineageOS).
+- Kernel release tags target CYG1/CYG4; user's CYG3 stock `boot.img` is required for a matched repack. Repack re-signs AVB with a generated key → unlocked bootloader needed.
+- RestlessOS has no supported local build path; its GitHub Actions + EC2 pipeline must be forked/configured (keys, costs) if self-building.
+
+### Publishing
+
+- Committed on `arena/76b5d892-grapheneos-sm-a155` and pushed to `origin`; SHA in `git log` / `git ls-remote`.
+
+### Next
+
+- Record build outcome truthfully; collect CYG3 `boot.img`, bootloader state, host RAM/SSD, and the read-only device baseline.
+
+---
+
 ## 2026-11-18 (update) — Owner decisions applied
 
 - **Changed:** D008 license sub-item resolved — Apache-2.0 adopted; `a155f-project-checkpoint.zip` removed (contents remain tracked directly); README/PROJECT_STATE updated to match.

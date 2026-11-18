@@ -4,13 +4,12 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint
 
-**Stage: documentation bootstrap published to the destination repository; implementation has not started.**
+**Stage: documentation bootstrap merged to `main` (PR #1, commit `cee1d02`); kernel source verified and first sandbox build attempted; implementation has not started.**
 
-- Requirements discussed and initial public references inspected (2026-11-16).
-- Documentation bootstrap created in the original session as local commit `c49fcf537a38fc03637cea1be331457d6ada3492`, transferred as `a155f-project-checkpoint.zip` (archive comment records that SHA). That commit is **not** part of this repository's history; this repository's first commit is `97d2c0e` ("Add files via upload").
-- Destination repository established: `https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-`. Development on review branch `arena/c08a6bcc-grapheneos-sm-a155` (branched from `main` @ `97d2c0e`). This checkpoint's commit SHA is in `git log`; branch tips move.
-- Archive contents extracted and merged into the repository root. The pre-existing `LICENSE` (Apache-2.0) and `README.md` scope note ("Helio G99 variant only") were preserved/merged, not replaced blindly.
-- Remaining blocking inputs are listed below; no device data has been collected yet.
+- 2026-11-18 (session 2): owner directed the kernel source (`poqdavid/android_kernel_samsung_sma155f`, `main` = stock-optimized, no root) and ROM source (`cawilliamson/treble_restlessos`, RestlessOS = unofficial GrapheneOS-fork **GSI**, `android-17.0`). See D009 for the D002 scope conflict; owner confirmation pending.
+- Kernel repo hands-on verification done (R008): hermetic toolchain bundled; build flow documented; CYG1/CYG4 vs user's CYG3 mismatch confirmed — repack needs the user's CYG3 stock `boot.img`; repack re-signs with a generated AVB key → unlocked bootloader required.
+- First kernel build runs in this sandbox (2 CPU / 3.8 GB RAM / Debian 12). Two environment workarounds were needed (GitHub API fetch for BBG setup; mawk→gawk notice stub). **Build result is pending** — this file will be updated with the outcome, not assumed.
+- No device data collected yet (user is away from the PC; device baseline still open).
 
 ## Verification of the received archive (re-run 2026-11-18)
 
@@ -41,7 +40,10 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 | GSI heat, apparent memory growth, crashes | User-reported symptoms | No exact GSI, logs, reproduction, or diagnosis |
 | MT6789 / Helio G99 platform | Public-source indication | Not checked on the user's device; see research references |
 | Public A155F Lineage tree exists | Web-observed | Inspected selected files only; not build/device validated |
-| Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; push performed from the Arena session (see CHANGELOG) |
+| Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; PR #1 merged to `main` (`cee1d02`); session branch `arena/76b5d892-grapheneos-sm-a155` |
+| Kernel source selected | Owner-directed 2026-11-18 | `poqdavid/android_kernel_samsung_sma155f` `main` (stock-optimized, no root); hands-on verified (R008) |
+| ROM source selected | Owner-directed 2026-11-18; D002 conflict pending | `cawilliamson/treble_restlessos` RestlessOS GSI (R009); D009 confirmation open |
+| Kernel sandbox build | **In progress** | Stock variant, hermetic toolchain; outcome not yet recorded |
 | Host platform | User-confirmed 2026-11-18 | Windows, x86-64; RAM and free SSD still unknown |
 | Device inventories/logs received | Not done | None supplied |
 | Firmware extraction / blob audit | Not done | No matching local package supplied |
@@ -76,7 +78,7 @@ These are proposals, not test results:
 
 ## Next action
 
-**Collect the remaining host specs (RAM, free SSD) and the read-only device baseline (`docs/DEVICE_INVENTORY.md`) from the stock device.** Then select the WSL2/VM build-environment plan. Do not start a large source sync, create a purportedly complete device manifest, or flash anything before the missing baseline facts are resolved.
+**Record the sandbox kernel-build outcome, then (owner confirmation of D009 permitting) repack against the user's CYG3 stock `boot.img`.** Still needed from the user: host RAM/free SSD, the read-only device baseline (`docs/DEVICE_INVENTORY.md`), the CYG3 AP package (or at least its `boot.img`), and confirmation of bootloader-unlock state. Do not flash anything without explicit approval.
 
 ## First device acceptance gate
 
