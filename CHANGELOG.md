@@ -2,6 +2,16 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 (update) — Owner decisions applied
+
+- **Changed:** D008 license sub-item resolved — Apache-2.0 adopted; `a155f-project-checkpoint.zip` removed (contents remain tracked directly); README/PROJECT_STATE updated to match.
+- **Owner inputs:** build host is Windows x86-64 (RAM/free SSD pending); device is on stock `A155FXXS7CYG3` / Android 15.
+- **Validation:** documentation-only change; link/fence/UTF-8 checks re-run clean.
+- **Publishing:** committed on `arena/c08a6bcc-grapheneos-sm-a155` and pushed; SHA in `git log` / `git ls-remote`.
+- **Next:** host RAM/SSD + read-only device baseline from `docs/DEVICE_INVENTORY.md`.
+
+---
+
 ## 2026-11-18 — Checkpoint archive merged; destination repository established
 
 ### Changed

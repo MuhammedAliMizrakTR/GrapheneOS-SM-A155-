@@ -19,11 +19,16 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 - Credential/secret pattern scan: no matches (limited safeguard, not a security audit).
 - Archive SHA cross-check against the original session is not possible (different repository/history); contents match the documented initial checkpoint.
 
-## Discrepancies flagged at this checkpoint
+## Discrepancies flagged and resolved at this checkpoint
 
-1. `docs/DECISIONS.md` D008 records "no repository-wide license selected", but the destination repository was created with an **Apache-2.0 `LICENSE`** file. Owner confirmation needed: adopt Apache-2.0 (update D008) or replace the file.
-2. `a155f-project-checkpoint.zip` remains tracked but is now redundant (its contents are tracked directly). `.gitignore` excludes `*.zip` going forward, which does not untrack the existing archive. Owner decision needed: keep or remove.
-3. Original-session research (RESEARCH.md) is dated 2026-11-16 and unverified by build/device tests; upstream branches and listings may have changed since.
+1. ~~D008 vs `LICENSE`~~ → **Resolved 2026-11-18:** owner confirmed **Apache-2.0** as the project license; D008 updated.
+2. ~~Redundant `a155f-project-checkpoint.zip`~~ → **Resolved 2026-11-18:** owner decided to remove it; contents remain tracked directly.
+3. Original-session research (RESEARCH.md) is dated 2026-11-16 and unverified by build/device tests; upstream branches and listings may have changed since. (Open)
+
+## Owner inputs received (2026-11-18)
+
+- Build host: **Windows, x86-64** → Linux build environment via WSL2/VM; RAM and free SSD still unknown.
+- Device runtime: **stock firmware** (`A155FXXS7CYG3` / Android 15), no root/custom recovery reported → baseline outputs will be interpreted as stock.
 
 ## Evidence ledger
 
@@ -37,7 +42,7 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 | MT6789 / Helio G99 platform | Public-source indication | Not checked on the user's device; see research references |
 | Public A155F Lineage tree exists | Web-observed | Inspected selected files only; not build/device validated |
 | Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; push performed from the Arena session (see CHANGELOG) |
-| Host category Windows/macOS | User-selected category | Exact OS/architecture/RAM/storage unknown |
+| Host platform | User-confirmed 2026-11-18 | Windows, x86-64; RAM and free SSD still unknown |
 | Device inventories/logs received | Not done | None supplied |
 | Firmware extraction / blob audit | Not done | No matching local package supplied |
 | Source sync / ROM implementation | Not done | Documentation files only |
@@ -60,16 +65,18 @@ These are proposals, not test results:
 
 - [x] Destination repository HTTPS URL and owner-approved base branch. → `MuhammedAliMizrakTR/GrapheneOS-SM-A155-`, base `main`, review branches.
 - [x] Publishing method, authentication, and branch/PR authorization. → Authenticated `git`/`gh` push from the Arena session; review-branch workflow.
-- [ ] Owner confirmation: Apache-2.0 license adoption; keep-or-remove decision for `a155f-project-checkpoint.zip`.
-- [ ] Exact host OS, CPU architecture, RAM, free SSD space.
-- [ ] Whether current phone software is stock or a specific GSI; exact GSI/build if applicable.
+- [x] License decision. → Apache-2.0 adopted (owner, 2026-11-18); D008 updated.
+- [x] Checkpoint archive retention. → Removed (owner, 2026-11-18).
+- [x] Host OS/architecture. → Windows, x86-64 (owner, 2026-11-18).
+- [ ] Host RAM and free SSD space (decides WSL2 vs VM vs remote builder).
+- [x] Device runtime: stock vs GSI. → Stock `A155FXXS7CYG3` / Android 15 (user-reported, 2026-11-18).
 - [ ] Read-only device baseline and partition listings from `docs/DEVICE_INVENTORY.md`.
 - [ ] Matching stock firmware package identity and availability for local extraction.
 - [ ] Verified boot/root/recovery state and current kernel/modules baseline.
 
 ## Next action
 
-**Collect the build-host specifications and the read-only device baseline (`docs/DEVICE_INVENTORY.md`).** Do not start a large source sync, create a purportedly complete device manifest, or flash anything before the missing baseline facts are resolved.
+**Collect the remaining host specs (RAM, free SSD) and the read-only device baseline (`docs/DEVICE_INVENTORY.md`) from the stock device.** Then select the WSL2/VM build-environment plan. Do not start a large source sync, create a purportedly complete device manifest, or flash anything before the missing baseline facts are resolved.
 
 ## First device acceptance gate
 

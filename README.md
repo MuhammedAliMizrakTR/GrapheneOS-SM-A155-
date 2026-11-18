@@ -36,8 +36,8 @@ User-reported device/firmware: **SM-A155F**, `A155FXXS7CYG3`, Android 15 stable.
 
 - Destination repository: `https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-` (established 2026-11-18).
 - Development happens on review branches; the durable record is GitHub. See `PROJECT_STATE.md` for the current branch/commit and push status.
-- `a155f-project-checkpoint.zip` is the original documentation bootstrap archive (2026-11-16); its contents are now tracked directly in this repository. Retention or removal of the archive is an open owner decision.
-- The repository was created with an **Apache-2.0 `LICENSE`** file. The formal project license decision (D008) is still recorded as deferred; owner confirmation is pending. Until confirmed, treat Apache-2.0 as the repository's stated license and preserve third-party attribution when code is introduced.
+- The original documentation bootstrap arrived as `a155f-project-checkpoint.zip` (2026-11-16); its contents are now tracked directly in this repository and the archive was removed by owner decision (2026-11-18).
+- Project license: **Apache-2.0** (owner-confirmed 2026-11-18; see `LICENSE` and `docs/DECISIONS.md` D008). Preserve third-party attribution when code is introduced; this repository cannot relicense imported material.
 
 ## Source and distribution policy
 

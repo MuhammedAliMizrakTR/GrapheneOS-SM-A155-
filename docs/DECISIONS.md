@@ -54,7 +54,6 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 ## D008 — Release security, licensing, and branding
 
 - Date: 2026-11-16; updated 2026-11-18
-- Status: **Deferred**
-- Open: Maintained framework/vendor baseline, exact privacy feature list, threat model, signing/update design, project license/name, and distribution rights.
-- Observed (2026-11-18): the destination repository was created with an **Apache-2.0 `LICENSE`** file, which conflicts with "no repository-wide license selected". Pending owner confirmation: adopt Apache-2.0 as the project license (and close this sub-item) or replace the file. Until then, Apache-2.0 is the repository's stated license.
-- Constraint: Do not claim GrapheneOS-equivalent security or safe custom-key bootloader relocking without evidence. No third-party source or binaries were copied into the documentation bootstrap.
+- Status: **License sub-item resolved** — owner confirmed on 2026-11-18: **Apache-2.0 is the project license**, matching the `LICENSE` file the repository was created with. Remaining items below stay deferred.
+- Open: Maintained framework/vendor baseline, exact privacy feature list, threat model, signing/update design, project name/branding, and distribution rights.
+- Constraint: Do not claim GrapheneOS-equivalent security or safe custom-key bootloader relocking without evidence. No third-party source or binaries were copied into the documentation bootstrap. Preserve upstream licenses and attribution when code is introduced; this repository cannot relicense imported material.
