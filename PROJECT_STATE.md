@@ -8,7 +8,7 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 - 2026-11-18 (session 2): owner directed the kernel source (`poqdavid/android_kernel_samsung_sma155f`, `main` = stock-optimized, no root) and ROM source (`cawilliamson/treble_restlessos`, RestlessOS = unofficial GrapheneOS-fork **GSI**, `android-17.0`). See D009 for the D002 scope conflict; owner confirmation pending.
 - Kernel repo hands-on verification done (R008): hermetic toolchain bundled; build flow documented; CYG1/CYG4 vs user's CYG3 mismatch confirmed — repack needs the user's CYG3 stock `boot.img`; repack re-signs with a generated AVB key → unlocked bootloader required.
-- First kernel build runs in this sandbox (2 CPU / 3.8 GB RAM / Debian 12). Two environment workarounds were needed (GitHub API fetch for BBG setup; mawk→gawk notice stub). **Build result is pending** — this file will be updated with the outcome, not assumed.
+- First kernel build **succeeded** in this sandbox (2 CPU / 3.8 GB RAM / Debian 12, `-j2`, 44m06s). Two environment workarounds were needed (GitHub API fetch for BBG setup; mawk→gawk notice stub). Artifacts: `Image`/`Image.gz`, signed `boot-repacked-signed.img`, `stock_optimized_5.10.226_A155FXXS7CYG4_A15_GKI.tar` (hashes in CHANGELOG). **Build-tested only — never flashed or device-tested.** The repack base is the repo's shipped CYG4 `boot.img.lz4`; a CYG3-matched repack still needs the user's stock `boot.img`.
 - No device data collected yet (user is away from the PC; device baseline still open).
 
 ## Verification of the received archive (re-run 2026-11-18)
@@ -43,7 +43,7 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 | Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; PR #1 merged to `main` (`cee1d02`); session branch `arena/76b5d892-grapheneos-sm-a155` |
 | Kernel source selected | Owner-directed 2026-11-18 | `poqdavid/android_kernel_samsung_sma155f` `main` (stock-optimized, no root); hands-on verified (R008) |
 | ROM source selected | Owner-directed 2026-11-18; D002 conflict pending | `cawilliamson/treble_restlessos` RestlessOS GSI (R009); D009 confirmation open |
-| Kernel sandbox build | **In progress** | Stock variant, hermetic toolchain; outcome not yet recorded |
+| Kernel sandbox build | **Build-tested 2026-11-18 (not device-tested)** | Stock variant built OK in 44m06s (2 CPU/3.8 GB sandbox): kernel `5.10.226-android12-9-31117096`, `Image.gz` sha256 `b5a4dc9b…6809`; repack+AVB-sign OK; tar sha256 `c8697ee5…1443`. Repack base is the shipped **CYG4** boot image — not yet matched to user's CYG3 |
 | Host platform | User-confirmed 2026-11-18 | Windows, x86-64; RAM and free SSD still unknown |
 | Device inventories/logs received | Not done | None supplied |
 | Firmware extraction / blob audit | Not done | No matching local package supplied |

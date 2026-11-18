@@ -2,6 +2,35 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 (session 2b) — Kernel build succeeded in sandbox (build-tested only)
+
+### Built
+
+- `poqdavid/android_kernel_samsung_sma155f` @ `main` (`7a2d6bc`), stock-optimized variant (no root, no SUSFS), hermetic clang-r416183b toolchain, `-j2` on 2 CPU / 3.8 GB RAM: **build completed in 44m06s**.
+- Artifacts (SHA-256):
+  - `arch/arm64/boot/Image.gz` — `b5a4dc9b0bd62aef4c2cf8266cb2818421d9c2fc149c78f59207f64bbebb6809`
+  - `repackfiles/boot-repacked-signed.img` (64 MB) — `dd6413e3d5d48de2874dfcb34a5cc9307150276fbaf03629ab73adb3bcafeeda`
+  - `release/stock_optimized_5.10.226_A155FXXS7CYG4_A15_GKI.tar` (67 MB) — `c8697ee51d676a575d7bb16dc594452fad7fe75fcfb4f774996c8f0303ae1443`
+- Kernel release string: `5.10.226-android12-9-31117096`; vendor modules (mali, gps, fmradio, connectivity…) built and depmod'd cleanly.
+- `lz4` v1.11.1 built from source with the bundled clang for the repack step (no host toolchain changes).
+
+### Environment fixes applied (local, not upstream)
+
+- Baseband-Guard `setup.sh` fetched via GitHub API and invoked locally (`raw.githubusercontent.com` unreachable from this sandbox; the script's own `git clone` via github.com works).
+- BBG's informational `show_config_lsm_notice` stubbed (distro `mawk` lacks gawk's 3-arg `match()`); functional BBG steps unaffected.
+
+### Explicitly NOT done
+
+- **Not flashed, not device-tested.** No boot claim.
+- Repack base is the shipped **CYG4** boot image — flashing as-is on the user's **CYG3** device is not advised; supply the CYG3 stock `boot.img` for a matched repack.
+- Signed with a freshly generated AVB key → flashing requires an unlocked bootloader; key is throwaway sandbox material, not a release key.
+
+### Next
+
+- Owner: CYG3 stock `boot.img` (from AP), bootloader-unlock state, D009 confirmation, and whether to publish this validation artifact (draft prerelease) or keep it local.
+
+---
+
 ## 2026-11-18 (session 2) — Kernel/ROM sources selected; first sandbox kernel build attempted
 
 ### Changed
