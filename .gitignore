@@ -1,0 +1,57 @@
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+/secrets/
+/private/
+/.config/gh/
+*.token
+*.key
+*.keystore
+*.jks
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Firmware, device dumps, extracted proprietary files, private logs, build output
+/firmware/
+/dumps/
+/artifacts/
+/logs/
+/out/
+/target/
+/ccache/
+/.repo/
+**/proprietary/**
+*.img
+*.img.lz4
+*.bin
+*.ko
+*.apk
+*.apks
+*.aab
+*.zip
+*.tar
+*.tar.md5
+*.tar.gz
+*.tar.xz
+*.7z
+*.lz4
+*.log
+*.hprof
+*.pcap
+*.pcapng
+
+# Machine/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+__pycache__/
+*.py[cod]
+.venv/
+
+# Ignore rules are not a security boundary. Review staged files and licenses.
+# Track reviewed sanitized logs under a deliberate alternative path if needed.
+# Public certificates/test artifacts may need explicit review before being added.
