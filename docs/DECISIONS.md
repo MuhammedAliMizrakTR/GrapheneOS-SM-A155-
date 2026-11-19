@@ -67,3 +67,25 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Status: **License sub-item resolved** — owner confirmed on 2026-11-18: **Apache-2.0 is the project license**, matching the `LICENSE` file the repository was created with. Remaining items below stay deferred.
 - Open: Maintained framework/vendor baseline, exact privacy feature list, threat model, signing/update design, project name/branding, and distribution rights.
 - Constraint: Do not claim GrapheneOS-equivalent security or safe custom-key bootloader relocking without evidence. No third-party source or binaries were copied into the documentation bootstrap. Preserve upstream licenses and attribution when code is introduced; this repository cannot relicense imported material.
+
+## D010 — ROM delivery: Odin AP package built by GitHub Actions (no fastbootd)
+
+- Date: 2026-11-19
+- Status: **Accepted (owner-directed 2026-11-19)** — "önce orjinal CYG4, sonra paketlenmiş AP; fastbootd yok".
+- Decision: ship the ROM as a single Odin-flashable `AP_*.tar.md5` = stock CYG4 AP member list/order with three swaps: `boot` ← our released v1.0 kernel (pulled from release v1.0, SHA-256-pinned, **never rebuilt**), `super` ← rebuilt with RestlessOS GSI as `system` and stock vendor/product/odm carried byte-identical, `vbmeta*` ← `avbtool --flags 3` (disabled). Users flash stock CYG4 first, then this AP, then format data.
+- Why Actions: the build sandbox cannot download release assets or Samsung FUS firmware (egress-limited); GitHub-hosted runners can. Pipeline lives in `.github/workflows/build-rom.yml` + `rom/`; architecture in `docs/ROM_BUILD.md`.
+- Consequence: release assets >2 GB must be split (1900 MB parts + SHA256SUMS). Kernel bytes provably identical to the v1.0 round-2 builds via the pinned hashes in `rom/fetch-inputs.sh`.
+
+## D011 — Unlocked-bootloader SIM-drop bug: ship the community ril-restart workaround
+
+- Date: 2026-11-19
+- Status: **Accepted (owner-directed 2026-11-19)** — "SimBUG fix'i içine dahil et".
+- Finding: on SM-A155F with an unlocked bootloader, stock `ril-daemon` hangs the modem after ~7h25m runtime (XDA 4688638/4703177); affects stock and GSIs (vendor RIL). No root-cause fix exists (Samsung/MTK side; even the A155F kernel devs report none).
+- Decision: ship a clean-room KernelSU/Magisk module (`rom/simfix/RILFix_A15`, method per rev.s; concept per itsfaris' RILFix_Faris.zip) that restarts ril-daemon every 6 h, embedded into the ROM at `/system/etc/a155f-extras/` and attached to the release. Default ROM kernel variant = `kernelsunext` because the module needs root; the `vanilla` package is documented as carrying **no** SIM fix.
+
+## D012 — Baked A155F GSI presets via the RIL-fix module (rooted variants)
+
+- Date: 2026-11-19
+- Status: **Accepted (owner-directed 2026-11-19)** — "derin optimizasyon, sürücüler, sistem kararlılığı".
+- Research basis: XDA A15/Samsung GSI guides (threads 4564191, 4646402, 4688239) + TrebleDroid `treble_app` source for exact prop keys. Findings: fingerprint workaround, extended backlight, extra sensors, aux cameras, flash strength, MTK GED KPI, SF GL backpressure disable (prop is inverted), auto-restart-RIL, headset-jack fix.
+- Decision: apply them as **non-destructive presets** (`resetprop -n`, user toggles win) inside the RILFix module (`rom/simfix/RILFix_A15/a155f-presets.prop`), NOT by editing `build.prop` inside the GSI — debugfs cannot set SELinux xattrs, and an unlabeled `build.prop` risks property-load failure. Vendor drivers stay Samsung's (carried in super). GPU/scheduler "deep tuning" beyond these props requires a booted device to validate — deferred to phase 2 with on-device measurements.

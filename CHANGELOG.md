@@ -211,3 +211,21 @@ All repacked into Odin-ready `.tar` (magiskboot + avbtool, fresh per-run AVB key
 - **Known failures:** unresolved issues and reproduction details.
 - **Publishing:** actual branch/commit and push/PR result; say explicitly if unpushed.
 - **Next:** one clear next action and required inputs.
+
+### 2026-11-19 — ROM packaging pipeline (CI) + SIM-fix module
+
+- **Changed:** added `.github/workflows/build-rom.yml` + `rom/` (fetch → extract → modify GSI → repack super → vbmeta → pack AP → prerelease), `rom/simfix/RILFix_A15` module source, `docs/ROM_BUILD.md`; decisions D010/D011.
+- **Evidence:** v1.0 kernel artifacts hash-pinned in `rom/fetch-inputs.sh` (round-2 SHA-256); RestlessOS GSI verified via upstream sha512sum; firmware pulled version-pinned (`A155FXXS7CYG4`) from Samsung FUS via samloader.
+- **Validation:** scripts syntax-checked locally; pipeline itself is CI-only (sandbox egress blocks release assets + Samsung FUS — reason for D010). **No device test yet.**
+- **Known failures:** none yet — first CI run pending; first boot of an Android 17 GSI on the Android 15 vendor is the known acceptance gate.
+- **Publishing:** this branch + PR.
+- **Next:** owner triggers the workflow; iterate on run logs; then first on-device flash gate.
+
+### 2026-11-19 (2) — Deep-optimization research, sandbox toolchain, verified super round-trip
+
+- **Changed:** `rom/tools.sh` (apt-free toolchain provisioning), `rom/simg2img.py` (pure-python sparse→raw), `rom/simfix/RILFix_A15/a155f-presets.prop` (researched A155F phh presets, applied via `resetprop -n` in service.sh), lp_plan.py rewritten for the real lpdumps JSON+text schema, repack-super.sh/modify-gsi.sh adapted (lpdumps dual output, debugfs-based GSI edits, no mounts), fetch-inputs.sh gained LOCAL mode (`INPUTS_DIR`), workflow default variant = bakasu, avbtool source fixed (LineageOS mirror), D012.
+- **Evidence:** sandbox dry-run with synthetic super: lpmake → simg2img.py → lpdumps/lpunpack → lp_plan.py → lpmake rebuild → system bytes = GSI marker, vendor/product bytes hash-identical. Tools: Rprop/aosp15_partition_tools static binaries run clean; e2fsprogs 1.47.4 + lz4 1.11.1 built from source.
+- **Validation:** build-level only (toolchain + planner round-trip). No device test. GSI/fs edits not yet run against a real image (input bytes can't enter the sandbox — see D010 note on egress).
+- **Known failures:** Drive connector cannot deliver the 943 MB GSI / ~5 GB firmware into the sandbox (100 MB inline-base64 cap); sandbox release-asset/FUS egress blocked. CI (PR #5) remains the zero-upload path.
+- **Publishing:** this branch (updates PR #5).
+- **Next:** owner picks the build path (Actions run vs. git-staged inputs for a sandbox build).

@@ -59,6 +59,10 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 - **Android 17 GSI on an Android 15 vendor (CYG3)** — VINTF/ABI compatibility must be validated on-device; expect rough edges.
 - Release tracked: [`17.0.0-202611021750`](https://github.com/cawilliamson/treble_restlessos/releases/latest) (`RestlessOS-arm64-ab-…img.xz`).
 
+### 📦 One-package install (no fastbootd)
+
+The ROM ships as a **single Odin AP package** built by CI (`.github/workflows/build-rom.yml`): RestlessOS as `system` inside a rebuilt `super`, the **v1.0 kernel** (pulled from Release v1.0, SHA-256-pinned), the **stock CYG4 driver stack** (vendor/product/odm carried byte-identical), disabled `vbmeta`, and an **embedded SIM-drop fix** module (`/system/etc/a155f-extras/RILFix_A15.zip`, rooted variants). Install: flash stock **A155FXXS7CYG4** (any region) → flash our AP package → format data. Full story: [docs/ROM_BUILD.md](docs/ROM_BUILD.md). Status: **CI-ready, not device-tested.**
+
 ---
 
 ## 📋 Requirements & flashing overview
