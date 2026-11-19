@@ -63,33 +63,32 @@ jobs:
           sudo swapoff -a || true
           df -h /
 
-      - name: Install tools
+      - name: Base packages (apt, tolerant — nothing critical here)
         run: |
-          set -e
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends \
-            lz4 xz-utils zip unzip f2fs-tools erofs-utils e2fsprogs \
-            android-sdk-libsparse-utils android-tools-fsutils \
-            python3-pip python3-venv git curl file
-          pip install --break-system-packages "git+https://github.com/nlscc/samloader.git" 2>/dev/null \
-            || pip install "git+https://github.com/nlscc/samloader.git"
-          for t in lz4 xz zip unzip samloader; do
-            command -v "$t" >/dev/null || { echo "MISSING TOOL: $t"; exit 1; }
-          done
-          # lptools: prefer apt's, fall back to the vendored static build
-          if ! command -v lpmake >/dev/null; then
-            echo "apt lptools missing — provisioning static tools via rom/tools.sh"
-            rom/tools.sh
-            export PATH="$PWD/tools/lptools/linux_glibc_x86_64:$PATH"
-            echo "$PWD/tools/lptools/linux_glibc_x86_64" >> "$GITHUB_PATH"
-          fi
-          command -v lpmake; command -v lpunpack; (command -v lpdump || command -v lpdumps)
-          echo "toolchain OK"; samloader --help 2>&1 | head -5 || true
+          sudo apt-get update -qq || true
+          sudo apt-get install -y --no-install-recommends xz-utils zip unzip lz4 file erofs-utils f2fs-tools \
+            || sudo apt-get install -y --no-install-recommends xz-utils zip unzip lz4 || true
+          command -v xz zip unzip git curl python3 && echo "base OK"
 
-      - name: Fetch avbtool (AOSP mirror)
+      - name: samloader (pip, from GitHub)
         run: |
-          git clone --depth 1 https://github.com/LineageOS/android_external_avb tools/avb
-          test -f tools/avb/avbtool.py && chmod +x tools/avb/avbtool.py && echo avbtool OK
+          pip install --break-system-packages "git+https://github.com/nlscc/samloader.git" 2>/dev/null \
+            || pip install "git+https://github.com/nlscc/samloader.git" \
+            || python3 -m pip install --break-system-packages "git+https://github.com/nlscc/samloader.git"
+          samloader --help 2>&1 | head -3
+
+      - name: Provision build tools (rom/tools.sh — sandbox-proven)
+        run: |
+          rom/tools.sh
+          for d in tools/lptools/linux_glibc_x86_64 tools/lz4 tools/e2fsprogs/b/misc tools/e2fsprogs/b/debugfs tools/e2fsprogs/b/e2fsck tools/e2fsprogs/b/resize; do
+            echo "$PWD/$d" >> "$GITHUB_PATH"
+          done
+
+      - name: Verify toolchain
+        run: |
+          command -v lpmake lpunpack lz4 mke2fs debugfs e2fsck resize2fs samloader
+          (command -v lpdump || command -v lpdumps)
+          test -f tools/avb/avbtool.py && echo "avbtool OK"
 
       - name: Fetch inputs — v1.0 kernel (sha256-pinned), RestlessOS GSI (sha512-verified), stock firmware
         run: rom/fetch-inputs.sh

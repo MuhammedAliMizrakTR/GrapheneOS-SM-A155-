@@ -65,10 +65,14 @@ else
     | grep -E '^RestlessOS-arm64-ab-.*\.img\.xz$' | grep -v -i erofs | head -1)
   SUMF=$(gh api "repos/$RREPO/releases/tags/$RREF" --jq '.assets[].name' | grep -m1 '\.sha512sum$')
   [ -n "$GASSET" ] || { echo "no plain arm64-ab img.xz asset found"; exit 1; }
-  gh release download "$RREF" -R "$RREPO" -p "$GASSET" -p "$SUMF" -D work/gsi --clobber
-  ( cd work/gsi && grep "$(basename "$GASSET")" "$SUMF" | sha512sum -c - )
+  gh release download "$RREF" -R "$RREPO" -p "$GASSET" -D work/gsi --clobber
+  if [ -n "${SUMF:-}" ]; then
+    gh release download "$RREF" -R "$RREPO" -p "$SUMF" -D work/gsi --clobber
+    ( cd work/gsi && grep "$(basename "$GASSET")" "$SUMF" | sha512sum -c - )
+  fi
   xz -dc "work/gsi/$GASSET" > work/gsi/gsi.img
-  rm -f "work/gsi/$GASSET" "work/gsi/$SUMF"
+  rm -f "work/gsi/$GASSET"
+  [ -n "${SUMF:-}" ] && rm -f "work/gsi/$SUMF"
   echo "$RREF" > work/gsi/TAG
 
   echo "=== [3/3] stock firmware $FW_VERSION ($FW_REGION) via Samsung FUS ==="
