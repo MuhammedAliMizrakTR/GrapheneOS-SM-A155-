@@ -90,8 +90,14 @@ jobs:
           (command -v lpdump || command -v lpdumps)
           test -f tools/avb/avbtool.py && echo "avbtool OK"
 
-      - name: Fetch inputs — v1.0 kernel (sha256-pinned), RestlessOS GSI (sha512-verified), stock firmware
-        run: rom/fetch-inputs.sh
+      - name: Fetch kernel — v1.0 artifact (sha256-pinned)
+        run: rom/fetch-inputs.sh kernel
+
+      - name: Fetch RestlessOS GSI (sha512-verified)
+        run: rom/fetch-inputs.sh gsi
+
+      - name: Fetch stock firmware (Samsung FUS, version-pinned)
+        run: rom/fetch-inputs.sh firmware
 
       - name: Extract stock AP members
         run: rom/extract-ap.sh
