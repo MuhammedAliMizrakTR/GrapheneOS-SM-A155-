@@ -2,6 +2,25 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 (session 3) — Direction confirmed; draft prerelease approved
+
+### Owner decisions
+
+- **D009 accepted**, D002 amended: RestlessOS GSI made device-specific with the matched A155F kernel + stock CYG3 vendor drivers (owner: "GSI'ı device-specific'e dönüştürelim").
+- CYG4-base kernel repack acceptable for now; CYG3-matched repack deferred.
+- Bootloader reported **unlocked** — AVB re-signed images are flashable.
+- Draft prerelease of the validation kernel tar **approved**.
+
+### Actions
+
+- Sandbox `/tmp` was wiped between turns; full pipeline re-executed in-session: clone → patch workaround → build (**43m59s, success**) → repack+sign (success).
+- **Reproducibility evidence:** two independent clean builds produced byte-identical `Image.gz` (sha256 `b5a4dc9b…6809`). Signed boot images differ per run because repack generates a fresh AVB key each time.
+- Draft prerelease `kernel-validation-5.10.226-20261118` created with notes+hashes. **Binary asset upload failed** (`uploads.github.com` unreachable from this sandbox, EOF on POST) — the tar is instead served temporarily via the sandbox preview HTTP server; hashes below verify any copy.
+- Published-artifact hashes (SHA-256): tar `d1a9f3434a4bc42805cf2487b2a26e780872beefb2bfdedf2e9c8b3ca10612cd`; `boot-repacked-signed.img` `edf694e20a6e9496148d4803786ec408b54b5b1e3b36c9a6c7f90e50e081d8bf`; `Image.gz` `b5a4dc9b0bd62aef4c2cf8266cb2818421d9c2fc149c78f59207f64bbebb6809`.
+- Identified RestlessOS latest prebuilt for later device validation: `17.0.0-202611021750`, asset `RestlessOS-arm64-ab-17.0.0-202611021750.img.xz` (943 MB, arm64-ab matches A155F).
+
+---
+
 ## 2026-11-18 (session 2b) — Kernel build succeeded in sandbox (build-tested only)
 
 ### Built

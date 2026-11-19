@@ -42,8 +42,9 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 | Public A155F Lineage tree exists | Web-observed | Inspected selected files only; not build/device validated |
 | Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; PR #1 merged to `main` (`cee1d02`); session branch `arena/76b5d892-grapheneos-sm-a155` |
 | Kernel source selected | Owner-directed 2026-11-18 | `poqdavid/android_kernel_samsung_sma155f` `main` (stock-optimized, no root); hands-on verified (R008) |
-| ROM source selected | Owner-directed 2026-11-18; D002 conflict pending | `cawilliamson/treble_restlessos` RestlessOS GSI (R009); D009 confirmation open |
-| Kernel sandbox build | **Build-tested 2026-11-18 (not device-tested)** | Stock variant built OK in 44m06s (2 CPU/3.8 GB sandbox): kernel `5.10.226-android12-9-31117096`, `Image.gz` sha256 `b5a4dc9b…6809`; repack+AVB-sign OK; tar sha256 `c8697ee5…1443`. Repack base is the shipped **CYG4** boot image — not yet matched to user's CYG3 |
+| ROM source selected | **Accepted 2026-11-18 (D009)** | RestlessOS GSI + matched A155F kernel/drivers ("device-specific-ized GSI"); D002 amended |
+| Kernel sandbox build | **Build-tested 2026-11-18 ×2 (not device-tested)** | Two clean builds (44m06s / 43m59s) produced byte-identical `Image.gz` sha256 `b5a4dc9b…6809` → reproducible. Repack+AVB-sign OK; published tar sha256 `d1a9f343…12cd` (CYG4 base, owner accepted). Draft prerelease `kernel-validation-5.10.226-20261118` created; binary served via sandbox preview (uploads.github.com blocked) |
+| Bootloader state | User-reported unlocked 2026-11-18 | AVB re-signed images flashable; rollback = flash stock `boot.img` back |
 | Host platform | User-confirmed 2026-11-18 | Windows, x86-64; RAM and free SSD still unknown |
 | Device inventories/logs received | Not done | None supplied |
 | Firmware extraction / blob audit | Not done | No matching local package supplied |
@@ -70,10 +71,13 @@ These are proposals, not test results:
 - [x] License decision. → Apache-2.0 adopted (owner, 2026-11-18); D008 updated.
 - [x] Checkpoint archive retention. → Removed (owner, 2026-11-18).
 - [x] Host OS/architecture. → Windows, x86-64 (owner, 2026-11-18).
-- [ ] Host RAM and free SSD space (decides WSL2 vs VM vs remote builder).
+- [ ] Host RAM and free SSD space (decides WSL2 vs VM vs remote builder; less urgent now that kernel builds succeed in-sandbox and RestlessOS is CI-built).
 - [x] Device runtime: stock vs GSI. → Stock `A155FXXS7CYG3` / Android 15 (user-reported, 2026-11-18).
+- [x] ROM/kernel source direction. → D009 accepted: RestlessOS GSI + matched A155F kernel/drivers.
+- [x] Bootloader state. → Unlocked (user-reported, 2026-11-18); AVB re-signed images are flashable.
+- [x] Repack firmware match. → Owner accepted CYG4-base repack for now; CYG3-matched repack deferred.
 - [ ] Read-only device baseline and partition listings from `docs/DEVICE_INVENTORY.md`.
-- [ ] Matching stock firmware package identity and availability for local extraction.
+- [ ] Matching stock firmware package identity and availability for local extraction (still needed for a CYG3-matched repack and rollback safety).
 - [ ] Verified boot/root/recovery state and current kernel/modules baseline.
 
 ## Next action
