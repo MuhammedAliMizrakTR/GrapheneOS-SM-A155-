@@ -82,7 +82,7 @@ These are proposals, not test results:
 
 ## Next action
 
-**Record the sandbox kernel-build outcome, then (owner confirmation of D009 permitting) repack against the user's CYG3 stock `boot.img`.** Still needed from the user: host RAM/free SSD, the read-only device baseline (`docs/DEVICE_INVENTORY.md`), the CYG3 AP package (or at least its `boot.img`), and confirmation of bootloader-unlock state. Do not flash anything without explicit approval.
+**Run the ROM packaging workflow** (`.github/workflows/build-rom.yml`, decisions D010/D011): it assembles an Odin-flashable AP (RestlessOS 17 GSI as system + v1.0 kernel hash-pulled from release v1.0 + stock CYG4 vendor stack + disabled vbmeta + embedded RIL-fix module). After a clean CI run: owner flashes stock CYG4, then the package, on an explicitly approved test cycle, and reports first-boot logs. Still open: host RAM/free SSD, read-only device baseline (`docs/DEVICE_INVENTORY.md`), CYG3 boot.img for the deferred CYG3-matched repack.
 
 ## First device acceptance gate
 

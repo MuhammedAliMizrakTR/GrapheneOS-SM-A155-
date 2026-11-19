@@ -1,0 +1,125 @@
+name: Build A155F ROM (RestlessOS 17 + v1.0 kernel → Odin AP)
+
+# One-shot ROM packager for SM-A155F:
+#   stock CYG4 firmware (Samsung FUS, version-pinned) + RestlessOS 17 GSI
+#   + our already-released v1.0 kernel (sha256-pinned, NOT rebuilt)
+#   → single Odin-flashable AP tar(.md5), split for GitHub release limits.
+#
+# See docs/ROM_BUILD.md for architecture and user flashing guide.
+
+on:
+  workflow_dispatch:
+    inputs:
+      kernel_variant:
+        description: "v1.0 kernel variant (SIM-fix module needs a rooted one; vanilla = no RIL fix)"
+        type: choice
+        options:
+          - kernelsunext
+          - bakasu
+          - vanilla
+        default: kernelsunext
+      fw_version:
+        description: "Stock firmware to base vendor/product/odm on"
+        default: "A155FXXS7CYG4"
+        required: true
+      fw_region:
+        description: "Samsung region/CSC code for the FUS download"
+        default: "TUR"
+        required: true
+      restless_ref:
+        description: "treble_restlessos release tag (empty = latest)"
+        default: ""
+      release_tag:
+        description: "Tag of the prerelease that receives the ROM package"
+        default: "rom-v1.0"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rom-build
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  KERNEL_VARIANT: ${{ inputs.kernel_variant }}
+  FW_VERSION: ${{ inputs.fw_version }}
+  FW_REGION: ${{ inputs.fw_region }}
+  RESTLESS_REF: ${{ inputs.restless_ref }}
+  RELEASE_TAG: ${{ inputs.release_tag }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/share/swift /usr/local/.ghcup 2>/dev/null || true
+          docker rmi -f $(docker images -aq) 2>/dev/null || true
+          sudo swapoff -a || true
+          df -h /
+
+      - name: Install tools
+        run: |
+          set -e
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            lz4 xz-utils zip unzip f2fs-tools erofs-utils e2fsprogs \
+            android-sdk-libsparse-utils android-tools-fsutils \
+            python3-pip python3-venv git curl file
+          pip install --break-system-packages "git+https://github.com/nlscc/samloader.git" 2>/dev/null \
+            || pip install "git+https://github.com/nlscc/samloader.git"
+          for t in lpmake lpunpack lpdump simg2img img2simg lz4 xz zip unzip samloader e2fsck resize2fs; do
+            command -v "$t" >/dev/null || { echo "MISSING TOOL: $t"; exit 1; }
+          done
+          echo "toolchain OK"; samloader --help 2>&1 | head -5 || true
+
+      - name: Fetch avbtool (AOSP mirror)
+        run: |
+          git clone --depth 1 https://github.com/aosp-mirror/platform_external_avb tools/avb
+          test -f tools/avb/avbtool.py && chmod +x tools/avb/avbtool.py && echo avbtool OK
+
+      - name: Fetch inputs — v1.0 kernel (sha256-pinned), RestlessOS GSI (sha512-verified), stock firmware
+        run: rom/fetch-inputs.sh
+
+      - name: Extract stock AP members
+        run: rom/extract-ap.sh
+
+      - name: Build RIL-fix module + manager APK
+        run: rom/build-rilfix-module.sh
+
+      - name: Modify GSI (embed extras)
+        run: rom/modify-gsi.sh
+
+      - name: Repack super (GSI system + stock vendor/product/odm)
+        run: rom/repack-super.sh
+
+      - name: Disabled vbmeta image(s)
+        run: rom/make-vbmeta.sh
+
+      - name: Assemble AP tar.md5 + split + checksums
+        run: rom/pack-ap.sh
+
+      - name: Render release notes
+        run: rom/render-notes.sh
+
+      - name: Publish prerelease
+        run: |
+          set -e
+          cd out
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --prerelease --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$RELEASE_TAG" --prerelease \
+              --title "RestlessOS 17 (GrapheneOS fork) — SM-A155F — ${KERNEL_VARIANT} kernel (Odin AP)" \
+              --notes-file RELEASE_NOTES.md
+          fi
+          cd dist && sha256sum -c SHA256SUMS.txt >/dev/null && for f in *; do
+            echo "uploading $f"
+            gh release upload "$RELEASE_TAG" "$f" --clobber
+          done
+          echo "DONE: $(gh release view "$RELEASE_TAG" --json url --jq .url)"
