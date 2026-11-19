@@ -42,6 +42,24 @@ pipeline runs there:
 Outputs land in a prerelease (`rom-v1.0` by default): split AP parts,
 `SHA256SUMS.txt`, `RILFix_A15.zip`, manager APK, notes.
 
+## Toolchain (no apt needed)
+
+`rom/tools.sh` provisions everything from GitHub sources: static lptools
+(lpmake/lpunpack/lpdumps, android-15.0.0_r25), lz4, e2fsprogs
+(mke2fs/debugfs/e2fsck/resize2fs), avbtool (LineageOS mirror), plus the
+pure-python `rom/simg2img.py`. The whole super repack was round-trip-verified
+in-sandbox on 2026-11-19: synthetic stock super → unpack → replan with a fake
+GSI → rebuild → unpack → system bytes == GSI, vendor bytes hash-identical.
+
+## Local (sandbox) mode
+
+`INPUTS_DIR=/path/to/inputs rom/fetch-inputs.sh` etc. — expects the variant
+kernel tar, a `RestlessOS-arm64-ab-*.img.xz` (or `gsi.img`), and the stock
+`AP_*.tar[.md5]` in one directory. Same pipeline as CI, zero downloads.
+Sandbox caveat: release-asset hosts and Samsung FUS are egress-blocked here,
+so inputs must arrive via git or connector; Drive's connector caps binary
+downloads at 100 MB inline, which excludes the GSI/firmware.
+
 ## "Drivers and optimizations" — what that means on Treble
 
 On a Treble device the drivers live in **vendor/product/odm**, which we carry

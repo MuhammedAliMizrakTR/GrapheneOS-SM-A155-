@@ -14,10 +14,10 @@ on:
         description: "v1.0 kernel variant (SIM-fix module needs a rooted one; vanilla = no RIL fix)"
         type: choice
         options:
-          - kernelsunext
           - bakasu
+          - kernelsunext
           - vanilla
-        default: kernelsunext
+        default: bakasu
       fw_version:
         description: "Stock firmware to base vendor/product/odm on"
         default: "A155FXXS7CYG4"
@@ -73,14 +73,22 @@ jobs:
             python3-pip python3-venv git curl file
           pip install --break-system-packages "git+https://github.com/nlscc/samloader.git" 2>/dev/null \
             || pip install "git+https://github.com/nlscc/samloader.git"
-          for t in lpmake lpunpack lpdump simg2img img2simg lz4 xz zip unzip samloader e2fsck resize2fs; do
+          for t in lz4 xz zip unzip samloader; do
             command -v "$t" >/dev/null || { echo "MISSING TOOL: $t"; exit 1; }
           done
+          # lptools: prefer apt's, fall back to the vendored static build
+          if ! command -v lpmake >/dev/null; then
+            echo "apt lptools missing — provisioning static tools via rom/tools.sh"
+            rom/tools.sh
+            export PATH="$PWD/tools/lptools/linux_glibc_x86_64:$PATH"
+            echo "$PWD/tools/lptools/linux_glibc_x86_64" >> "$GITHUB_PATH"
+          fi
+          command -v lpmake; command -v lpunpack; (command -v lpdump || command -v lpdumps)
           echo "toolchain OK"; samloader --help 2>&1 | head -5 || true
 
       - name: Fetch avbtool (AOSP mirror)
         run: |
-          git clone --depth 1 https://github.com/aosp-mirror/platform_external_avb tools/avb
+          git clone --depth 1 https://github.com/LineageOS/android_external_avb tools/avb
           test -f tools/avb/avbtool.py && chmod +x tools/avb/avbtool.py && echo avbtool OK
 
       - name: Fetch inputs — v1.0 kernel (sha256-pinned), RestlessOS GSI (sha512-verified), stock firmware

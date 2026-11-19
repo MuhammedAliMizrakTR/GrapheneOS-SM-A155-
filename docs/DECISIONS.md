@@ -82,3 +82,10 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Status: **Accepted (owner-directed 2026-11-19)** — "SimBUG fix'i içine dahil et".
 - Finding: on SM-A155F with an unlocked bootloader, stock `ril-daemon` hangs the modem after ~7h25m runtime (XDA 4688638/4703177); affects stock and GSIs (vendor RIL). No root-cause fix exists (Samsung/MTK side; even the A155F kernel devs report none).
 - Decision: ship a clean-room KernelSU/Magisk module (`rom/simfix/RILFix_A15`, method per rev.s; concept per itsfaris' RILFix_Faris.zip) that restarts ril-daemon every 6 h, embedded into the ROM at `/system/etc/a155f-extras/` and attached to the release. Default ROM kernel variant = `kernelsunext` because the module needs root; the `vanilla` package is documented as carrying **no** SIM fix.
+
+## D012 — Baked A155F GSI presets via the RIL-fix module (rooted variants)
+
+- Date: 2026-11-19
+- Status: **Accepted (owner-directed 2026-11-19)** — "derin optimizasyon, sürücüler, sistem kararlılığı".
+- Research basis: XDA A15/Samsung GSI guides (threads 4564191, 4646402, 4688239) + TrebleDroid `treble_app` source for exact prop keys. Findings: fingerprint workaround, extended backlight, extra sensors, aux cameras, flash strength, MTK GED KPI, SF GL backpressure disable (prop is inverted), auto-restart-RIL, headset-jack fix.
+- Decision: apply them as **non-destructive presets** (`resetprop -n`, user toggles win) inside the RILFix module (`rom/simfix/RILFix_A15/a155f-presets.prop`), NOT by editing `build.prop` inside the GSI — debugfs cannot set SELinux xattrs, and an unlabeled `build.prop` risks property-load failure. Vendor drivers stay Samsung's (carried in super). GPU/scheduler "deep tuning" beyond these props requires a booted device to validate — deferred to phase 2 with on-device measurements.

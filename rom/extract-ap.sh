@@ -6,14 +6,18 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p work/ap/small
 
-ZIP=$(ls work/fw/*.zip | head -1)
-APMEMBER=$(unzip -Z1 "$ZIP" | grep -m1 '^AP_.*\.tar\.md5$')
-echo "AP member: $APMEMBER"
-unzip -o "$ZIP" "$APMEMBER" -d work/ap/
-rm -f "$ZIP"   # free several GB early
+if ls work/ap/AP_*.tar* >/dev/null 2>&1; then
+  # LOCAL mode: AP tar already staged by fetch-inputs.sh
+  AP=$(ls work/ap/AP_*.tar* | head -1)
+else
+  ZIP=$(ls work/fw/*.zip | head -1)
+  APMEMBER=$(unzip -Z1 "$ZIP" | grep -m1 '^AP_.*\.tar\.md5$')
+  echo "AP member: $APMEMBER"
+  unzip -o "$ZIP" "$APMEMBER" -d work/ap/
+  rm -f "$ZIP"   # free several GB early
+  AP="work/ap/$APMEMBER"
+fi
 df -h . | tail -1
-
-AP="work/ap/$APMEMBER"
 tar -tf "$AP" > work/ap/members.txt 2>/dev/null || tar -tf "$AP" --ignore-zeros > work/ap/members.txt
 echo "--- stock AP members (order is significant) ---"
 cat work/ap/members.txt
