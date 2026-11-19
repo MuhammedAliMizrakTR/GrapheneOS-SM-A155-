@@ -2,6 +2,15 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-19 (session 5) — v1.0 binaries rebuilt after sandbox wipe; hashes updated
+
+- Sandbox `/tmp` was wiped between sessions; all three variants rebuilt from identical sources (Vanilla 43m07s / BakaSU 43m20s / KernelSU-Next 43m51s). Vanilla `Image.gz` reproduced byte-identical a third time (`b5a4dc9b…6809`).
+- Fresh repack AVB keys → new `.tar` hashes (authoritative): Vanilla `77a3c547…38b4`, BakaSU `a963a725…d0cf`, KernelSU-Next `0d8e6d4d…15b4`. The v1.0 release body was updated to match (`gh release edit v1.0`).
+- Assets still cannot be attached from the sandbox (`uploads.github.com` blocked); binaries served via the sandbox preview HTTP server for the owner to download and attach manually.
+- Release `v1.0`: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/v1.0 (published).
+
+---
+
 ## 2026-11-18/19 (session 4) — v1.0 Initial Build published (3 kernel variants)
 
 ### Built (sandbox, hermetic clang-r416183b, -j2)
