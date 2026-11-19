@@ -43,7 +43,7 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 | Destination repository + authenticated publishing | **Established 2026-11-18** | Remote `origin` observed; PR #1 merged to `main` (`cee1d02`); session branch `arena/76b5d892-grapheneos-sm-a155` |
 | Kernel source selected | Owner-directed 2026-11-18 | `poqdavid/android_kernel_samsung_sma155f` `main` (stock-optimized, no root); hands-on verified (R008) |
 | ROM source selected | **Accepted 2026-11-18 (D009)** | RestlessOS GSI + matched A155F kernel/drivers ("device-specific-ized GSI"); D002 amended |
-| Kernel sandbox build | **Build-tested 2026-11-18 ×2 (not device-tested)** | Two clean builds (44m06s / 43m59s) produced byte-identical `Image.gz` sha256 `b5a4dc9b…6809` → reproducible. Repack+AVB-sign OK; published tar sha256 `d1a9f343…12cd` (CYG4 base, owner accepted). Draft prerelease `kernel-validation-5.10.226-20261118` created; binary served via sandbox preview (uploads.github.com blocked) |
+| Kernel sandbox build | **Build-tested 2026-11-18/19 ×4, published v1.0** | Vanilla (`d1a9f343…`), BakaSU 35262+SUSFS v2.4.0 (`d568a8ff…`), KernelSU-Next 33548+SUSFS v2.4.0 (`9bca4f9e…`). Reproducibility: identical `Image.gz` across clean builds. Release `v1.0` published; assets via sandbox preview (uploads.github.com blocked). CYG4 repack base, owner-accepted |
 | Bootloader state | User-reported unlocked 2026-11-18 | AVB re-signed images flashable; rollback = flash stock `boot.img` back |
 | Host platform | User-confirmed 2026-11-18 | Windows, x86-64; RAM and free SSD still unknown |
 | Device inventories/logs received | Not done | None supplied |

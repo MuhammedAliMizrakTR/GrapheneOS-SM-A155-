@@ -2,6 +2,35 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18/19 (session 4) — v1.0 Initial Build published (3 kernel variants)
+
+### Built (sandbox, hermetic clang-r416183b, -j2)
+
+| Variant | Branch | Time | .tar SHA-256 |
+|---|---|---|---|
+| Vanilla (stock-optimized, no root) | `main` (`7a2d6bc`) | 43m59s | `d1a9f3434a4bc42805cf2487b2a26e780872beefb2bfdedf2e9c8b3ca10612cd` |
+| BakaSU 35262 + SUSFS v2.4.0 | `bakasu` (`94bc278`) | 45m25s | `d568a8ffc90baa3cdb44b7c9deca8d7d1251eedd6471a3dd2e85d2b3025154ea` |
+| KernelSU-Next 33548 + SUSFS v2.4.0 | `kernelsunext` (`c935b8d`) | 44m44s | `9bca4f9e2adac22bd8af210adf2698ced61f98278fd923452979523fdd6cf513` |
+
+All repacked into Odin-ready `.tar` (magiskboot + avbtool, fresh per-run AVB key). Variant branch deltas were fetched into one clone to fit sandbox disk; `out/` cleaned between builds.
+
+### Published
+
+- GitHub Release **`v1.0` — "v1.0 Initial Build"**: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/v1.0 (published, not draft; supersedes and deletes the earlier draft `kernel-validation-5.10.226-20261118`).
+- **Asset upload blocked** (`uploads.github.com` unreachable from this sandbox, 3/3 EOF) — release carries notes + SHA-256; binaries are temporarily served via the sandbox preview HTTP server and must be attached to the release manually (or re-uploaded from the owner's machine).
+- Release notes include owner-requested lines verbatim ("If you dont like it give me feedback (or js leave)"; Known Bugs: "Testers needed if you find a bug give me logs (or gtfo)").
+
+### Explicitly NOT done
+
+- No on-device test of any variant — first boot gate still open. Notes label this clearly.
+- CYG3-matched repack still pending (CYG4 base, owner-accepted).
+
+### Next
+
+- Owner flashes Vanilla first (rollback = stock `boot.img`), records boot/ADB/idle results per the acceptance gate; then RestlessOS arm64-ab GSI pairing.
+
+---
+
 ## 2026-11-18 (session 3) — Direction confirmed; draft prerelease approved
 
 ### Owner decisions
