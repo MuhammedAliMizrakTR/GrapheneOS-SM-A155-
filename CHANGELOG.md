@@ -2,6 +2,114 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18/19 (session 4) — v1.0 Initial Build published (3 kernel variants)
+
+### Built (sandbox, hermetic clang-r416183b, -j2)
+
+| Variant | Branch | Time | .tar SHA-256 |
+|---|---|---|---|
+| Vanilla (stock-optimized, no root) | `main` (`7a2d6bc`) | 43m59s | `d1a9f3434a4bc42805cf2487b2a26e780872beefb2bfdedf2e9c8b3ca10612cd` |
+| BakaSU 35262 + SUSFS v2.4.0 | `bakasu` (`94bc278`) | 45m25s | `d568a8ffc90baa3cdb44b7c9deca8d7d1251eedd6471a3dd2e85d2b3025154ea` |
+| KernelSU-Next 33548 + SUSFS v2.4.0 | `kernelsunext` (`c935b8d`) | 44m44s | `9bca4f9e2adac22bd8af210adf2698ced61f98278fd923452979523fdd6cf513` |
+
+All repacked into Odin-ready `.tar` (magiskboot + avbtool, fresh per-run AVB key). Variant branch deltas were fetched into one clone to fit sandbox disk; `out/` cleaned between builds.
+
+### Published
+
+- GitHub Release **`v1.0` — "v1.0 Initial Build"**: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/v1.0 (published, not draft; supersedes and deletes the earlier draft `kernel-validation-5.10.226-20261118`).
+- **Asset upload blocked** (`uploads.github.com` unreachable from this sandbox, 3/3 EOF) — release carries notes + SHA-256; binaries are temporarily served via the sandbox preview HTTP server and must be attached to the release manually (or re-uploaded from the owner's machine).
+- Release notes include owner-requested lines verbatim ("If you dont like it give me feedback (or js leave)"; Known Bugs: "Testers needed if you find a bug give me logs (or gtfo)").
+
+### Explicitly NOT done
+
+- No on-device test of any variant — first boot gate still open. Notes label this clearly.
+- CYG3-matched repack still pending (CYG4 base, owner-accepted).
+
+### Next
+
+- Owner flashes Vanilla first (rollback = stock `boot.img`), records boot/ADB/idle results per the acceptance gate; then RestlessOS arm64-ab GSI pairing.
+
+---
+
+## 2026-11-18 (session 3) — Direction confirmed; draft prerelease approved
+
+### Owner decisions
+
+- **D009 accepted**, D002 amended: RestlessOS GSI made device-specific with the matched A155F kernel + stock CYG3 vendor drivers (owner: "GSI'ı device-specific'e dönüştürelim").
+- CYG4-base kernel repack acceptable for now; CYG3-matched repack deferred.
+- Bootloader reported **unlocked** — AVB re-signed images are flashable.
+- Draft prerelease of the validation kernel tar **approved**.
+
+### Actions
+
+- Sandbox `/tmp` was wiped between turns; full pipeline re-executed in-session: clone → patch workaround → build (**43m59s, success**) → repack+sign (success).
+- **Reproducibility evidence:** two independent clean builds produced byte-identical `Image.gz` (sha256 `b5a4dc9b…6809`). Signed boot images differ per run because repack generates a fresh AVB key each time.
+- Draft prerelease `kernel-validation-5.10.226-20261118` created with notes+hashes. **Binary asset upload failed** (`uploads.github.com` unreachable from this sandbox, EOF on POST) — the tar is instead served temporarily via the sandbox preview HTTP server; hashes below verify any copy.
+- Published-artifact hashes (SHA-256): tar `d1a9f3434a4bc42805cf2487b2a26e780872beefb2bfdedf2e9c8b3ca10612cd`; `boot-repacked-signed.img` `edf694e20a6e9496148d4803786ec408b54b5b1e3b36c9a6c7f90e50e081d8bf`; `Image.gz` `b5a4dc9b0bd62aef4c2cf8266cb2818421d9c2fc149c78f59207f64bbebb6809`.
+- Identified RestlessOS latest prebuilt for later device validation: `17.0.0-202611021750`, asset `RestlessOS-arm64-ab-17.0.0-202611021750.img.xz` (943 MB, arm64-ab matches A155F).
+
+---
+
+## 2026-11-18 (session 2b) — Kernel build succeeded in sandbox (build-tested only)
+
+### Built
+
+- `poqdavid/android_kernel_samsung_sma155f` @ `main` (`7a2d6bc`), stock-optimized variant (no root, no SUSFS), hermetic clang-r416183b toolchain, `-j2` on 2 CPU / 3.8 GB RAM: **build completed in 44m06s**.
+- Artifacts (SHA-256):
+  - `arch/arm64/boot/Image.gz` — `b5a4dc9b0bd62aef4c2cf8266cb2818421d9c2fc149c78f59207f64bbebb6809`
+  - `repackfiles/boot-repacked-signed.img` (64 MB) — `dd6413e3d5d48de2874dfcb34a5cc9307150276fbaf03629ab73adb3bcafeeda`
+  - `release/stock_optimized_5.10.226_A155FXXS7CYG4_A15_GKI.tar` (67 MB) — `c8697ee51d676a575d7bb16dc594452fad7fe75fcfb4f774996c8f0303ae1443`
+- Kernel release string: `5.10.226-android12-9-31117096`; vendor modules (mali, gps, fmradio, connectivity…) built and depmod'd cleanly.
+- `lz4` v1.11.1 built from source with the bundled clang for the repack step (no host toolchain changes).
+
+### Environment fixes applied (local, not upstream)
+
+- Baseband-Guard `setup.sh` fetched via GitHub API and invoked locally (`raw.githubusercontent.com` unreachable from this sandbox; the script's own `git clone` via github.com works).
+- BBG's informational `show_config_lsm_notice` stubbed (distro `mawk` lacks gawk's 3-arg `match()`); functional BBG steps unaffected.
+
+### Explicitly NOT done
+
+- **Not flashed, not device-tested.** No boot claim.
+- Repack base is the shipped **CYG4** boot image — flashing as-is on the user's **CYG3** device is not advised; supply the CYG3 stock `boot.img` for a matched repack.
+- Signed with a freshly generated AVB key → flashing requires an unlocked bootloader; key is throwaway sandbox material, not a release key.
+
+### Next
+
+- Owner: CYG3 stock `boot.img` (from AP), bootloader-unlock state, D009 confirmation, and whether to publish this validation artifact (draft prerelease) or keep it local.
+
+---
+
+## 2026-11-18 (session 2) — Kernel/ROM sources selected; first sandbox kernel build attempted
+
+### Changed
+
+- Owner selected sources: kernel `poqdavid/android_kernel_samsung_sma155f` (`main`, stock-optimized no-root), ROM `cawilliamson/treble_restlessos` (RestlessOS GSI, `android-17.0`).
+- `docs/RESEARCH.md`: added R008 (kernel repo hands-on verification) and R009 (RestlessOS evaluation, incl. its GSI trust model and CI-only build pipeline).
+- `docs/DECISIONS.md`: added D009 (owner-directed GSI direction; conflicts with D002 — confirmation pending).
+- `PROJECT_STATE.md`: refreshed; PR #1 merged to `main` (`cee1d02`); new session branch `arena/76b5d892-grapheneos-sm-a155`.
+
+### Evidence / validation
+
+- Kernel repo cloned and inspected (branch map, hermetic toolchain, build/repack flow); findings in R008.
+- Kernel build started in this sandbox (stock variant, `-j2`); environment fixes: BBG `setup.sh` fetched via GitHub API (`raw.githubusercontent.com` unreachable), gawk-only notice stubbed for `mawk`. **Build outcome pending at commit time — see PROJECT_STATE.md; no success is claimed yet.**
+- No firmware extraction, device test, or RestlessOS build has run.
+
+### Known failures / open items
+
+- D009 needs explicit owner confirmation (GSI vs device-specific LineageOS).
+- Kernel release tags target CYG1/CYG4; user's CYG3 stock `boot.img` is required for a matched repack. Repack re-signs AVB with a generated key → unlocked bootloader needed.
+- RestlessOS has no supported local build path; its GitHub Actions + EC2 pipeline must be forked/configured (keys, costs) if self-building.
+
+### Publishing
+
+- Committed on `arena/76b5d892-grapheneos-sm-a155` and pushed to `origin`; SHA in `git log` / `git ls-remote`.
+
+### Next
+
+- Record build outcome truthfully; collect CYG3 `boot.img`, bootloader state, host RAM/SSD, and the read-only device baseline.
+
+---
+
 ## 2026-11-18 (update) — Owner decisions applied
 
 - **Changed:** D008 license sub-item resolved — Apache-2.0 adopted; `a155f-project-checkpoint.zip` removed (contents remain tracked directly); README/PROJECT_STATE updated to match.

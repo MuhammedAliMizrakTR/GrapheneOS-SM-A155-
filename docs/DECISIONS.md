@@ -11,10 +11,11 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 
 ## D002 — Product direction
 
-- Date: 2026-11-16
-- Status: **Accepted requirement**
-- Decision: LineageOS-based, privacy-focused, GrapheneOS-inspired, with optional genuine sandboxed Google Play support and a usable Play-free default.
-- Consequence: Conventional privileged GApps or microG cannot silently replace the sandboxed-Play requirement. This does not imply official GrapheneOS affiliation or equivalent security.
+- Date: 2026-11-16; amended 2026-11-18
+- Status: **Accepted requirement (amended)**
+- Decision (2026-11-16): LineageOS-based, privacy-focused, GrapheneOS-inspired, with optional genuine sandboxed Google Play support and a usable Play-free default.
+- Amendment (2026-11-18, owner): the ROM base changes to **RestlessOS** (unofficial GrapheneOS-fork GSI) made device-specific via the matched A155F kernel and stock-matched vendor drivers — see **D009**. The "not merely another GSI" intent survives as device-matched packaging and validation gates rather than a from-scratch LineageOS device tree; the LineageOS path is not closed if the GSI approach fails its gates.
+- Unchanged: sandboxed-Play requirement (GmsCompat lineage is preserved by RestlessOS); conventional privileged GApps or microG cannot silently replace it. No official GrapheneOS affiliation or equivalent-security claims.
 
 ## D003 — Durable development record
 
@@ -50,6 +51,15 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Status: **Partially resolved** — publishing leg resolved; host leg still open.
 - Resolved (2026-11-18): destination repository `https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-`, base branch `main`, review-branch workflow with authenticated push from the Arena session. No force-push.
 - Open: Windows versus macOS, CPU architecture, RAM/storage for the build host.
+
+## D009 — ROM source direction: RestlessOS GSI + device-matched kernel ("device-specific-ized GSI")
+
+- Date: 2026-11-18
+- Status: **Accepted (owner-confirmed 2026-11-18)** — supersedes the LineageOS-first reading of D002; see amendment note there.
+- Decision: use `cawilliamson/treble_restlessos` (unofficial GrapheneOS-fork GSI, `android-17.0`) as the ROM base, and make it device-specific by pairing it with the A155F-matched kernel (`poqdavid/android_kernel_samsung_sma155f`, `main` stock-optimized) and the stock CYG3-matched vendor/driver stack. Owner's words: embed the A155F kernel and drivers into the GSI rather than ship a bare generic image.
+- Practical packaging: device-targeted bundle = RestlessOS system image + A155F-matched `boot.img` (our kernel) + explicit firmware/vendor baseline (CYG3) + flashing/rollback instructions. A full self-built RestlessOS (forked GitHub Actions + EC2 pipeline) is a later phase; initial validation may use upstream RestlessOS prebuilt releases (arm64-ab) where lawful and version-appropriate.
+- Trust model (unchanged from R009): no GrapheneOS-equivalent claims; vendor partition/firmware remain Samsung's; AVB re-sign uses our own keys (bootloader unlocked, user-reported).
+- Consequence: VINTF/ABI compatibility of an Android 17 GSI with the Android 15 CYG3 vendor must be validated on-device (first boot gate). MTK 4.14/4.19 BPF bug is not applicable (5.10 kernel).
 
 ## D008 — Release security, licensing, and branding
 
