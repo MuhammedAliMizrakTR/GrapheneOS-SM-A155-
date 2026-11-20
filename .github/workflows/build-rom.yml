@@ -26,6 +26,10 @@ on:
         description: "Samsung region/CSC code for the FUS download"
         default: "TUR"
         required: true
+      fw_url:
+        description: "Optional: direct URL of the stock firmware zip (bypasses Samsung FUS, e.g. link-shared Drive file)"
+        default: ""
+        required: false
       restless_ref:
         description: "treble_restlessos release tag (empty = latest)"
         default: ""
@@ -36,6 +40,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: rom-build
@@ -45,6 +50,7 @@ env:
   KERNEL_VARIANT: ${{ inputs.kernel_variant }}
   FW_VERSION: ${{ inputs.fw_version }}
   FW_REGION: ${{ inputs.fw_region }}
+  FW_URL: ${{ inputs.fw_url }}
   RESTLESS_REF: ${{ inputs.restless_ref }}
   RELEASE_TAG: ${{ inputs.release_tag }}
 
@@ -63,57 +69,85 @@ jobs:
           sudo swapoff -a || true
           df -h /
 
-      - name: Install tools
+      - name: Base packages (apt, tolerant — nothing critical here)
         run: |
-          set -e
-          sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends \
-            lz4 xz-utils zip unzip f2fs-tools erofs-utils e2fsprogs \
-            android-sdk-libsparse-utils android-tools-fsutils \
-            python3-pip python3-venv git curl file
+          sudo apt-get update -qq || true
+          sudo apt-get install -y --no-install-recommends xz-utils zip unzip lz4 file erofs-utils f2fs-tools \
+            || sudo apt-get install -y --no-install-recommends xz-utils zip unzip lz4 || true
+          command -v xz zip unzip git curl python3 && echo "base OK"
+
+      - name: samloader (pip, from GitHub)
+        run: |
           pip install --break-system-packages "git+https://github.com/nlscc/samloader.git" 2>/dev/null \
-            || pip install "git+https://github.com/nlscc/samloader.git"
-          for t in lz4 xz zip unzip samloader; do
-            command -v "$t" >/dev/null || { echo "MISSING TOOL: $t"; exit 1; }
-          done
-          # lptools: prefer apt's, fall back to the vendored static build
-          if ! command -v lpmake >/dev/null; then
-            echo "apt lptools missing — provisioning static tools via rom/tools.sh"
-            rom/tools.sh
-            export PATH="$PWD/tools/lptools/linux_glibc_x86_64:$PATH"
-            echo "$PWD/tools/lptools/linux_glibc_x86_64" >> "$GITHUB_PATH"
-          fi
-          command -v lpmake; command -v lpunpack; (command -v lpdump || command -v lpdumps)
-          echo "toolchain OK"; samloader --help 2>&1 | head -5 || true
+            || pip install "git+https://github.com/nlscc/samloader.git" \
+            || python3 -m pip install --break-system-packages "git+https://github.com/nlscc/samloader.git"
+          samloader --help 2>&1 | head -3
 
-      - name: Fetch avbtool (AOSP mirror)
+      - name: Provision build tools (rom/tools.sh — sandbox-proven)
         run: |
-          git clone --depth 1 https://github.com/LineageOS/android_external_avb tools/avb
-          test -f tools/avb/avbtool.py && chmod +x tools/avb/avbtool.py && echo avbtool OK
+          rom/tools.sh
+          for d in tools/lptools/linux_glibc_x86_64 tools/lz4 tools/e2fsprogs/b/misc tools/e2fsprogs/b/debugfs tools/e2fsprogs/b/e2fsck tools/e2fsprogs/b/resize; do
+            echo "$PWD/$d" >> "$GITHUB_PATH"
+          done
 
-      - name: Fetch inputs — v1.0 kernel (sha256-pinned), RestlessOS GSI (sha512-verified), stock firmware
-        run: rom/fetch-inputs.sh
+      - name: Verify toolchain
+        run: |
+          command -v lpmake lpunpack lz4 mke2fs debugfs e2fsck resize2fs samloader
+          (command -v lpdump || command -v lpdumps)
+          test -f tools/avb/avbtool.py && echo "avbtool OK"
+
+      - name: Fetch kernel — v1.0 artifact (sha256-pinned)
+        run: |
+          mkdir -p work
+          set -o pipefail
+          rom/fetch-inputs.sh kernel 2>&1 | tee work/fetch-kernel.log
+
+      - name: Fetch RestlessOS GSI (sha512-verified)
+        run: |
+          mkdir -p work
+          set -o pipefail
+          rom/fetch-inputs.sh gsi 2>&1 | tee work/fetch-gsi.log
+
+      - name: Fetch stock firmware (Samsung FUS, version-pinned)
+        run: |
+          mkdir -p work
+          set -o pipefail
+          rom/fetch-inputs.sh firmware 2>&1 | tee work/fetch-firmware.log
 
       - name: Extract stock AP members
-        run: rom/extract-ap.sh
+        run: |
+          set -o pipefail
+          rom/extract-ap.sh 2>&1 | tee work/step-extract.log
 
       - name: Build RIL-fix module + manager APK
-        run: rom/build-rilfix-module.sh
+        run: |
+          set -o pipefail
+          rom/build-rilfix-module.sh 2>&1 | tee work/step-rilfix.log
 
       - name: Modify GSI (embed extras)
-        run: rom/modify-gsi.sh
+        run: |
+          set -o pipefail
+          rom/modify-gsi.sh 2>&1 | tee work/step-modify-gsi.log
 
       - name: Repack super (GSI system + stock vendor/product/odm)
-        run: rom/repack-super.sh
+        run: |
+          set -o pipefail
+          rom/repack-super.sh 2>&1 | tee work/step-repack.log
 
       - name: Disabled vbmeta image(s)
-        run: rom/make-vbmeta.sh
+        run: |
+          set -o pipefail
+          rom/make-vbmeta.sh 2>&1 | tee work/step-vbmeta.log
 
       - name: Assemble AP tar.md5 + split + checksums
-        run: rom/pack-ap.sh
+        run: |
+          set -o pipefail
+          rom/pack-ap.sh 2>&1 | tee work/step-pack.log
 
       - name: Render release notes
-        run: rom/render-notes.sh
+        run: |
+          set -o pipefail
+          rom/render-notes.sh 2>&1 | tee work/step-notes.log
 
       - name: Publish prerelease
         run: |
@@ -131,3 +165,14 @@ jobs:
             gh release upload "$RELEASE_TAG" "$f" --clobber
           done
           echo "DONE: $(gh release view "$RELEASE_TAG" --json url --jq .url)"
+
+      - name: Report failure details (CI logs are unreadable from the maintainer sandbox)
+        if: failure()
+        run: |
+          BODY=$( { echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID";
+                    echo "Variant: $KERNEL_VARIANT  FW: $FW_VERSION/$FW_REGION"; echo; echo '```';
+                    for f in work/fetch-*.log work/step-*.log; do [ -f "$f" ] && { echo "=== $f (tail) ==="; tail -25 "$f"; echo; };
+                    done; echo "=== work/ ==="; ls -laR work 2>/dev/null | head -50;
+                    echo "=== out/ ==="; ls -laR out 2>/dev/null | head -20; echo '```'; } | head -c 60000 )
+          gh issue create --title "ROM CI failure — run $GITHUB_RUN_ID ($KERNEL_VARIANT)" \
+            --body "$BODY" --label "ci-failure" || true

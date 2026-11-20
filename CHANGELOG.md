@@ -229,3 +229,18 @@ All repacked into Odin-ready `.tar` (magiskboot + avbtool, fresh per-run AVB key
 - **Known failures:** Drive connector cannot deliver the 943 MB GSI / ~5 GB firmware into the sandbox (100 MB inline-base64 cap); sandbox release-asset/FUS egress blocked. CI (PR #5) remains the zero-upload path.
 - **Publishing:** this branch (updates PR #5).
 - **Next:** owner picks the build path (Actions run vs. git-staged inputs for a sandbox build).
+
+## 2026-11-19 (3) — ilk CI ROM build'i yayında
+- build-rom.yml uçtan uca yeşil (run 44612795322): kernel (sha256-doğrulamalı) +
+  RestlessOS 17.0.0-202611021750 GSI (sha512) + stok CYG4 vendor/product/odm →
+  tek Odin AP tar.md5 (3 parça) + RILFix_A15.zip + ReSukiSU manager + SHA256SUMS
+  → prerelease `rom-v1.0`.
+- Yolda düzeltilen CI bug'ları: boot.img top-level cp/rm tuzağı, SIGPIPE/pipefail
+  (tar -tf|grep -m1, unzip -Z1|grep -m1), .tar.md5 trailer'ının hayalet üye
+  üretmesi (-T extraction "Not found in archive"), FUS datacenter-IP engeli
+  (fw_url direct-download modu eklendi), manager APK releases/latest 404
+  (prerelease-only repo), pack aşamasında ham vbmeta'nın .lz4 adıyla yazılması,
+  meta-data/ dizin üyesi, tar -T çift-ekleme (--no-recursion), kendi kendini
+  içeren SHA256SUMS.
+- Hata raporlama: failure() son-adımı log kuyruklarını ci-failure issue'su olarak
+  açıyor (sandbox log okuyamıyor); tümü kapatıldı.
