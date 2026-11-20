@@ -1,0 +1,105 @@
+name: 🐞 Bug report (ROM / kernel)
+description: Something is broken on the RestlessOS 17 build or a v1.0 kernel for the Galaxy A15 4G (SM-A155F). English only, please.
+title: "[Bug] <short summary>"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing! A good report = **one bug per issue** + **logs**. Reports without logs can rarely be acted on.
+
+  - type: dropdown
+    id: variant
+    attributes:
+      label: Which build are you running?
+      options:
+        - ROM — bakasu kernel (RestlessOS 17)
+        - ROM — kernelsunext kernel (RestlessOS 17)
+        - ROM — vanilla kernel (RestlessOS 17)
+        - Kernel only — bakasu (v1.0, on stock ROM)
+        - Kernel only — kernelsunext (v1.0, on stock ROM)
+        - Kernel only — stock_optimized (v1.0, on stock ROM)
+    validations:
+      required: true
+
+  - type: input
+    id: base
+    attributes:
+      label: Stock firmware you flashed BEFORE the ROM
+      description: "Expected: A155FXXS7CYG4 4-file package in Odin, booted once. Check: Settings → About phone → Build number."
+      placeholder: "e.g. A155FXXS7CYG4 (TUR)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Describe the bug. Include when it happens (first boot? after hours? specific app?).
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect instead?
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Flash ...
+        2. Boot ...
+        3. Open ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (required for crash/SIM/network issues)
+      description: Attach or paste. How to grab them is below.
+      value: |
+        <!--
+        HOW TO GET LOGS (pick what matches your bug):
+
+        Right after the bug happens, on a PC with ADB:
+          adb logcat -b all -d > logcat.txt        # system + app logs
+          adb shell dmesg > dmesg.txt              # kernel log (rooted builds)
+
+        SIM / network / modem bugs: also grab radio logs BEFORE the 6h watchdog restarts RIL:
+          adb logcat -b radio -d > radio.txt
+
+        Random reboot / kernel panic: after the reboot,
+          adb shell "su -c 'cat /sys/fs/pstore/console-ramoops*'" > ramoops.txt
+          (rooted builds only; on vanilla, describe what you saw instead)
+
+        Boot failure: photo of the screen + exact Odin steps you followed.
+
+        Drag & drop the .txt files into this issue. Do NOT paste thousands of lines inline.
+        -->
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting — confirm all of these
+      options:
+        - label: I flashed stock firmware first, then the ROM in the Odin **AP** slot, then formatted data.
+          required: true
+        - label: I verified the downloaded parts against `SHA256SUMS.txt`.
+          required: true
+        - label: I searched [open issues](../../issues) and this is not a duplicate.
+          required: true
+        - label: "For SIM/network issues on a rooted build: the RILFix_A15 module is installed and enabled (root manager → Modules)."
+          required: false
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        **Known limitations (not bugs):** no VoLTE (MTK IMS on GSIs), no verified boot / hardware attestation, no Samsung OTA updates. SIM drop every ~7h is a *vendor* bug — the embedded RILFix module works around it on rooted builds.
