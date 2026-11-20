@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📱 ROM download (rom-v1.0)
+    url: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0
+    about: RestlessOS 17 for Galaxy A15 4G — packages, install guide, and checksums live here. Not a bug channel.
+  - name: 🔧 Kernel packages (v1.0)
+    url: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/v1.0
+    about: Standalone Odin kernel tars (bakasu / kernelsunext / stock_optimized).
+  - name: ❓ Question / general discussion
+    url: https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/discussions
+    about: Questions, feature ideas, success reports — anything that is not a reproducible bug.
