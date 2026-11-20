@@ -13,7 +13,7 @@ export SIMFIX_LINE
 if [ "$KERNEL_VARIANT" = "vanilla" ]; then
   SIMFIX_LINE="**NOT AVAILABLE** — the vanilla kernel has no root, so the SIM-fix module cannot be installed. The network drops roughly every 7 hours; a reboot is needed. Use the kernelsunext/bakasu package for the SIM fix."
 else
-  SIMFIX_LINE="**INCLUDED** — \`/system/etc/a155f-extras/RILFix_A15.zip\` is embedded in the ROM. After installation, open the root manager (the APK ships in the same folder), Modules → Install from storage → \`/system/etc/a155f-extras/RILFix_A15.zip\`. The module restarts ril-daemon every 6 hours (the XDA-proven workaround for the ~7h25m modem hang)."
+  SIMFIX_LINE="**INCLUDED** — \`/system/etc/a155f-extras/RILFix_A15.zip\` is embedded in the ROM. After installation, install and open the matching manager APK from this release's separate asset, then Modules → Install from storage → \`/system/etc/a155f-extras/RILFix_A15.zip\`. The module restarts ril-daemon every 6 hours (the XDA-proven workaround for the ~7h25m modem hang)."
 fi
 envsubst '$RTAG $APBASE $KERNEL_VARIANT $FW_VERSION $FW_REGION $BUILD_DATE $SIMFIX_LINE' \
   < rom/release-notes-template.md > out/RELEASE_NOTES.md

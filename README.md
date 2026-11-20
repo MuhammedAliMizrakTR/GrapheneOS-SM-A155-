@@ -28,9 +28,9 @@ A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17,
 
 | Variant | Root manager | SIM fix |
 |---|---|---|
-| **bakasu** | ReSukiSU (BakaSU) | ✅ embedded |
-| **kernelsunext** | KernelSU-Next | ✅ embedded |
-| **vanilla** | — (unrooted) | ❌ not possible |
+| **bakasu** | BakaSU kernel (35262 manager APK is a separate release asset) | ✅ embedded; install the APK from the release first |
+| **kernelsunext** | KernelSU-Next kernel (33548 manager APK is a separate release asset) | ✅ embedded; install the APK from the release first |
+| **vanilla** | No root (unrooted) | ❌ unavailable; SIM workaround needs root |
 
 **Install:** flash stock `A155FXXS7CYG4` (BL+AP+CP+CSC) in Odin → join the 3 parts (`copy /b` on Windows / `cat` on Linux) → flash the joined tar in the **AP** slot → **format data**. Full guide + verification hashes are in the [release notes](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0).
 
@@ -61,7 +61,7 @@ A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17,
 
 ### Root manager apps (install after flashing a rooted variant)
 
-The matching manager APK ships **inside the ROM release** (see the [rom-v1.0 release](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)) — use that one, not a random upstream build, so the manager version matches the kernel-side driver (BakaSU 35262 / KernelSU-Next 33548). Sources: [Baka-SU/BakaSU](https://github.com/Baka-SU/BakaSU) · [KernelSU-Next/KernelSU-Next](https://github.com/KernelSU-Next/KernelSU-Next)
+The matching manager APK is a **separate asset on the ROM release** (see [rom-v1.0](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)); it is not baked into the AP image. Install only the APK matching the selected kernel driver (BakaSU 35262 / KernelSU-Next 33548). The unrooted vanilla variant needs no manager. Sources: [Baka-SU/BakaSU](https://github.com/Baka-SU/BakaSU) · [KernelSU-Next/KernelSU-Next](https://github.com/KernelSU-Next/KernelSU-Next)
 
 ---
 

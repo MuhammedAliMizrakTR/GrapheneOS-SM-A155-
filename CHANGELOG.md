@@ -2,6 +2,14 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 — Prepare additive ROM variant publishing (builds not yet run)
+
+- User requested Vanilla (unrooted) and KernelSU-Next (rooted) AP packages added to the existing `rom-v1.0` release; the matching KSU-Next manager APK will be uploaded separately by the owner after AP publication.
+- Inspected the live release asset list first. Existing BakaSU AP parts, BakaSU 35262 APK, RILFix module, and checksum asset must remain intact.
+- Hardened publishing so a workflow run does not edit an existing release's title/notes/prerelease state and uploads only the selected variant's split AP parts plus uniquely named checksum manifest, without `--clobber`.
+- Changed future ROM builds to keep root-manager APKs outside the AP/system image; this prevents a stale upstream manager APK from being embedded. Notes direct rooted users to install the exact versioned manager asset separately. Vanilla remains unrooted and cannot install the RIL fix.
+- Validation so far: `bash -n` on changed shell scripts and `git diff --check`; no YAML parser is installed in the sandbox. **No CI/build/release upload has run yet.**
+
 ## 2026-11-19 (session 5) — v1.0 binaries rebuilt after sandbox wipe; hashes updated
 
 - Sandbox `/tmp` was wiped between sessions; all three variants rebuilt from identical sources (Vanilla 43m07s / BakaSU 43m20s / KernelSU-Next 43m51s). Vanilla `Image.gz` reproduced byte-identical a third time (`b5a4dc9b…6809`).

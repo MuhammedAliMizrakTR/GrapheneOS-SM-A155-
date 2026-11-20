@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Embeds /system/etc/a155f-extras/ into the GSI (RIL-fix module zip, matching
-# root-manager APK, README). No loop mounts needed: ext4 images are edited
+# Embeds /system/etc/a155f-extras/ into the GSI (RIL-fix module zip and README;
+# manager APKs are separate release assets to avoid mismatched versions). No loop mounts needed: ext4 images are edited
 # with debugfs (built by rom/tools.sh); erofs images need fsck.erofs/mkfs.erofs
 # (CI runner apt: erofs-utils).
 set -euo pipefail
@@ -21,7 +21,8 @@ RILFix_A15.zip      - KernelSU-Next / BakaSU / Magisk module. Fixes the
                       brightness, sensors, camera, MTK GPU, jack).
                       Install from your root manager: Modules -> Install
                       from storage -> this file. Also attached to the release.
-Manager APK         - matching root manager for the flashed kernel variant.
+Manager APK         - download the exact version from the matching release asset;
+                      manager APKs are not embedded in the system image.
 Vanilla builds: no root, so no module — SIM bug NOT fixed there.
 EOF
 

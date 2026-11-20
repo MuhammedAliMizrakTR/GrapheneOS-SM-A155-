@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Builds the RIL-fix root-module zip (community-proven ril-daemon restart
-# workaround for the unlocked-bootloader ~7h25m modem hang on SM-A155F) and
-# fetches the matching root-manager APK for the chosen kernel variant.
+# workaround for the unlocked-bootloader ~7h25m modem hang on SM-A155F).
+# Manager APKs stay separate release assets to avoid embedding stale versions.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO_ROOT=$(pwd)
@@ -11,8 +11,11 @@ mkdir -p out/dist work/manager
 echo "module zip: $(stat -c%s out/dist/RILFix_A15.zip) bytes"
 
 case "$KERNEL_VARIANT" in
-  kernelsunext) MGR_REPO="KernelSU-Next/KernelSU-Next"; MGR_PAT='^KernelSU_Next_.*-release\.apk$' ;;
-  bakasu)       MGR_REPO="Baka-SU/BakaSU";               MGR_PAT='arm64-v8a.*\.apk$' ;;
+  # The matching KernelSU-Next 33548 manager is added by the maintainer as a
+  # separate release asset after the ROM AP is built. Never embed an older
+  # upstream manager APK whose versionCode does not match the kernel driver.
+  kernelsunext) MGR_REPO="";;
+  bakasu)       MGR_REPO="";;
   vanilla)      MGR_REPO="";;
   *) echo "unknown KERNEL_VARIANT"; exit 1;;
 esac
@@ -28,6 +31,6 @@ if [ -n "${MGR_REPO:-}" ]; then
   gh release download "$TAG" -R "$MGR_REPO" -p "$ASSET" -D work/manager --clobber
   cp "work/manager/$ASSET" out/dist/
 else
-  echo "vanilla variant: no manager APK (and no SIM fix) — documented in notes"
+  echo "$KERNEL_VARIANT variant: no manager APK embedded in system; install the matching manager APK from the release assets separately. Vanilla has no root manager and cannot use the SIM-fix module."
 fi
 ls -la out/dist/

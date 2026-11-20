@@ -2,7 +2,7 @@
 # Assembles the final Odin AP tar: stock member names and order, with our
 # kernel (boot), the rebuilt super, and disabled vbmeta images swapped in.
 # Appends the md5 (Samsung .tar.md5 convention), splits for the 2 GB
-# release-asset limit, and writes SHA256SUMS.
+# release-asset limit, and writes a variant-specific checksum manifest.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p work/stage out/dist
@@ -62,7 +62,8 @@ echo "AP tar: $(stat -c%s "out/${APBASE}.tar.md5") bytes, md5=$MD5"
 
 split -b 1900M -d "out/${APBASE}.tar.md5" "out/dist/${APBASE}.tar.md5."
 rm -f "out/${APBASE}.tar.md5"
-( cd out/dist && find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -printf "%f\n" | sort | xargs sha256sum > SHA256SUMS.txt )
+SUMFILE="${APBASE}.SHA256SUMS.txt"
+( cd out/dist && find . -maxdepth 1 -type f -name "${APBASE}.tar.md5.*" -printf "%f\n" | sort | xargs sha256sum > "$SUMFILE" )
 ls -la out/dist/
 df -h . | tail -1
 echo "=== AP packaged: ${APBASE}.tar.md5 (split into $(ls out/dist/${APBASE}.tar.md5.* | wc -l) parts) ==="
