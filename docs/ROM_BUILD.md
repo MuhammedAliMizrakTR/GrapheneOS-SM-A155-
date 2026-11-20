@@ -90,6 +90,7 @@ unnecessary.
 GitHub → Actions → **Build A155F ROM** → Run workflow:
 
 - `kernel_variant`: `kernelsunext` (default) / `bakasu` / `vanilla`
+- `ap_base_variant`: `stock` (download via FUS or `fw_url`), or reuse a `bakasu` / `kernelsunext` AP already on the release. Reuse mode verifies the donor AP's variant checksum manifest and avoids a second multi-GB firmware download.
 - `fw_version`: `A155FXXS7CYG4` (pinned; bump deliberately)
 - `fw_region`: `TUR` default; region only affects which CSC ships the donor
   vendor — users flash their own region's stock first anyway

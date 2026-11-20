@@ -18,8 +18,17 @@ on:
           - kernelsunext
           - vanilla
         default: bakasu
+      ap_base_variant:
+        description: "AP donor: stock firmware download, or reuse a verified AP variant already on the release"
+        type: choice
+        options:
+          - stock
+          - bakasu
+          - kernelsunext
+        default: stock
+        required: true
       fw_version:
-        description: "Stock firmware to base vendor/product/odm on"
+        description: "Stock firmware baseline represented by the AP donor"
         default: "A155FXXS7CYG4"
         required: true
       fw_region:
@@ -48,6 +57,7 @@ concurrency:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   KERNEL_VARIANT: ${{ inputs.kernel_variant }}
+  AP_BASE_VARIANT: ${{ inputs.ap_base_variant }}
   FW_VERSION: ${{ inputs.fw_version }}
   FW_REGION: ${{ inputs.fw_region }}
   FW_URL: ${{ inputs.fw_url }}
@@ -108,11 +118,15 @@ jobs:
           set -o pipefail
           rom/fetch-inputs.sh gsi 2>&1 | tee work/fetch-gsi.log
 
-      - name: Fetch stock firmware (Samsung FUS, version-pinned)
+      - name: Fetch AP donor (stock firmware or verified release AP)
         run: |
           mkdir -p work
           set -o pipefail
-          rom/fetch-inputs.sh firmware 2>&1 | tee work/fetch-firmware.log
+          if [ "$AP_BASE_VARIANT" = stock ]; then
+            rom/fetch-inputs.sh firmware 2>&1 | tee work/fetch-firmware.log
+          else
+            rom/fetch-inputs.sh ap-base 2>&1 | tee work/fetch-ap-base.log
+          fi
 
       - name: Extract stock AP members
         run: |
