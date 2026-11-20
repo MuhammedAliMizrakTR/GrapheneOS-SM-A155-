@@ -4,16 +4,15 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint (2026-11-18)
 
-**ROM release `rom-v1.0` now has a successful KernelSU-Next 33548 AP variant added; original BakaSU assets remain intact. Vanilla is still pending: a CI package succeeded once but upload path failed; the corrected run reached publish. A later retry hit a Google Drive interstitial, so the workflow now supports checksum-verified reuse of the existing KernelSU-Next AP as its vendor/firmware donor.** Working branch: `arena/31ec40b0-grapheneos-sm-a155`.
+**All three ROM AP variants are now present in release `rom-v1.0` (display name 1.1 ROM Initial Build): original BakaSU, new KernelSU-Next 33548, and new Vanilla unrooted. README and release description have been updated with exact assets and installation/variant differences. No existing release assets were deleted or overwritten.** Working branch: `arena/31ec40b0-grapheneos-sm-a155`; PR #16 remains open.
 
-- Confirmed existing `rom-v1.0` assets before changes: three BakaSU AP split parts, `BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk`, `RILFix_A15.zip`, and `SHA256SUMS.txt`. These remain present. KSN 33548 AP three parts + variant-specific SHA256 manifest were added by successful Actions run `44744378880`; no existing BakaSU asset was deleted or overwritten.
+- Confirmed existing `rom-v1.0` assets before changes: three BakaSU AP split parts, `BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk`, `RILFix_A15.zip`, and `SHA256SUMS.txt`. They remain present. KernelSU-Next 33548 AP three parts + variant manifest were added by Actions run `44744378880`; Vanilla AP three parts + variant manifest were added by run `44748382860`. Current release has 14 assets. Existing BakaSU assets and metadata were preserved; only release description was intentionally updated.
 - User requests two additional ROM packages: `vanilla` (unrooted) and `kernelsunext` (KernelSU-Next 33548); user will upload the matching KernelSU-Next manager APK separately at the end.
 - Workflow changes are being made to upload each variant's AP parts and unique checksum manifest only, without editing an existing release's body/status/title or overwriting any assets.
 - Manager APKs will not be embedded in future AP images. This avoids stale version mismatch; install the matching release APK separately. Vanilla has no root manager and no SIM-fix capability.
 - After both AP builds/assets are verified, update the release description and README with the variant matrix and accurate download/install steps. KernelSU-Next manager APK upload remains owner-deferred.
-- **Done:** KSN AP package was built and published successfully (run `44744378880`); release asset list confirms all three split parts and manifest. Vanilla package also assembled successfully in an earlier run but no assets were uploaded when the publish-path bug occurred; corrected-path attempt failed later at stock AP extraction because Drive returned an HTML interstitial. Added an AP-donor mode to reuse the published KSN package with manifest verification for the Vanilla run.
-- **In progress:** Vanilla AP build using `ap_base_variant=kernelsunext`, avoiding Drive/FUS; then update README and combined release body with all variants.
-- **Not yet done:** Vanilla release upload, release description edit, final README variant links, user’s separate KSN manager APK upload, device validation.
+- **Done:** KSN 33548 package built/published successfully (run `44744378880`); Vanilla package built/published from a checksum-verified KSN AP donor (run `44748382860`). Release description updated from `rom/combined-release-notes.md`; README now links every part/manifest and explains root/SIM-fix distinctions. Existing assets were retained.
+- **Pending:** owner-upload of the separate official-signature KernelSU-Next 33548 manager APK, as requested; device validation.
 
 ## Historical checkpoint
 
