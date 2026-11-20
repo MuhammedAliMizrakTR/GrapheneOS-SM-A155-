@@ -4,9 +4,9 @@
 
 # SM-A155F Privacy Project — Custom Kernels + RestlessOS (GrapheneOS-based)
 
-Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x).
+Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x)!!!.
 
-> ⚠️ **Status: build-tested, NOT device-tested.** Kernels compile, repack, and sign cleanly; nobody has booted them on hardware yet. Unlocked bootloader required. You flash at your own risk — keep your stock `boot.img` to recover.
+> ⚠️ **Status: build-tested, A155F device-tested.** Kernels compile, repack, booted on A155F and sign cleanly; nobody has booted them on other A15 hardware yet. Testers needeed! Unlocked bootloader required. You flash at your own risk — keep your stock `boot.img` to recover.
 
 ---
 
