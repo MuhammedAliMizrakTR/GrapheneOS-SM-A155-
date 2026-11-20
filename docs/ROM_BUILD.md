@@ -32,15 +32,14 @@ pipeline runs there:
 |---|---|---|
 | 1 | `fetch-inputs.sh` | kernel tar (hash-pinned) → `boot.img`; GSI xz → `gsi.img`; firmware zip (samloader) |
 | 2 | `extract-ap.sh` | pulls `AP_*.tar.md5` out of the firmware zip; records member list/order; extracts small members + super |
-| 3 | `build-rilfix-module.sh` | zips `simfix/RILFix_A15` (KSU/Magisk module) + downloads the matching root-manager APK |
+| 3 | `build-rilfix-module.sh` | zips `simfix/RILFix_A15` (KSU/Magisk module); manager APKs are separate release assets, never baked into AP images |
 | 4 | `modify-gsi.sh` | embeds `/system/etc/a155f-extras/` (module zip, manager APK, README) into the GSI (ext4 mount or erofs repack) |
 | 5 | `repack-super.sh` + `lp_plan.py` | `lpdump`/`lpunpack` stock super, `lpmake` a new sparse super: **system = GSI**, vendor/product/odm/… = stock bytes, stock geometry preserved |
 | 6 | `make-vbmeta.sh` | `avbtool make_vbmeta_image --flags 3` for every `vbmeta*` member (the standard "vbmeta_disabled") |
 | 7 | `pack-ap.sh` | reassembles the AP tar with stock member names/order, md5-appends (`.tar.md5`), splits at 1900 MB for release-asset limits, writes SHA256SUMS |
 | 8 | `render-notes.sh` | bilingual release notes |
 
-Outputs land in a prerelease (`rom-v1.0` by default): split AP parts,
-`SHA256SUMS.txt`, `RILFix_A15.zip`, manager APK, notes.
+Outputs land on the selected GitHub release (`rom-v1.0` by default): split AP parts and a variant-specific `${APBASE}.SHA256SUMS.txt`. Publishing is additive: existing release title, description, status, and assets are not overwritten. Manager APKs are separate release assets so a stale or mismatched APK can never be silently embedded in a ROM.
 
 ## Toolchain (no apt needed)
 
@@ -91,6 +90,7 @@ unnecessary.
 GitHub → Actions → **Build A155F ROM** → Run workflow:
 
 - `kernel_variant`: `kernelsunext` (default) / `bakasu` / `vanilla`
+- `ap_base_variant`: `stock` (download via FUS or `fw_url`), or reuse a `bakasu` / `kernelsunext` AP already on the release. Reuse mode verifies the donor AP's variant checksum manifest and avoids a second multi-GB firmware download.
 - `fw_version`: `A155FXXS7CYG4` (pinned; bump deliberately)
 - `fw_region`: `TUR` default; region only affects which CSC ships the donor
   vendor — users flash their own region's stock first anyway

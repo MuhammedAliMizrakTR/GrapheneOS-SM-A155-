@@ -83,6 +83,14 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Finding: on SM-A155F with an unlocked bootloader, stock `ril-daemon` hangs the modem after ~7h25m runtime (XDA 4688638/4703177); affects stock and GSIs (vendor RIL). No root-cause fix exists (Samsung/MTK side; even the A155F kernel devs report none).
 - Decision: ship a clean-room KernelSU/Magisk module (`rom/simfix/RILFix_A15`, method per rev.s; concept per itsfaris' RILFix_Faris.zip) that restarts ril-daemon every 6 h, embedded into the ROM at `/system/etc/a155f-extras/` and attached to the release. Default ROM kernel variant = `kernelsunext` because the module needs root; the `vanilla` package is documented as carrying **no** SIM fix.
 
+## D013 — Additive multi-variant ROM release assets; matching root manager stays separate
+
+- Date: 2026-11-18
+- Status: **Accepted (owner-directed)** — add Vanilla and KernelSU-Next AP packages to the existing 1.1 ROM release; owner will upload the KernelSU-Next manager APK last.
+- Decision: future workflow runs upload only the current variant's split AP parts and a uniquely named checksum file. Existing release metadata/assets are never edited or clobbered by the build job. The combined release description is updated after all AP variants are present.
+- Manager APKs are separate release assets and must match the exact kernel driver version (BakaSU 35262; KernelSU-Next 33548). Do not bake old upstream APK versions into a ROM AP/system image. The vanilla variant is unrooted, has no manager, and cannot install the root-dependent SIM fix.
+- Acceptance remains pending: both Actions runs succeed, all new parts/checksum files appear, original release assets remain unchanged, then README/release notes are updated. No AP build or upload is claimed yet.
+
 ## D012 — Baked A155F GSI presets via the RIL-fix module (rooted variants)
 
 - Date: 2026-11-19

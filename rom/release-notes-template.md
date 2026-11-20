@@ -8,10 +8,10 @@
 2. Download this release's parts and join them:
    - Windows: `copy /b ${APBASE}.tar.md5.00+${APBASE}.tar.md5.01+${APBASE}.tar.md5.02 ${APBASE}.tar.md5`
    - Linux/macOS: `cat ${APBASE}.tar.md5.* > ${APBASE}.tar.md5`
-   - Verify against `SHA256SUMS.txt`.
+   - Verify against `${APBASE}.SHA256SUMS.txt`.
 3. Boot into Download Mode → Odin → place the joined file in the **AP** slot → flash.
 4. **Format data is mandatory** (Wipe data/factory reset in recovery) — required on the first switch to a GSI.
-5. Rooted variants: after boot, open the root manager → Modules → Install from storage → `/system/etc/a155f-extras/RILFix_A15.zip` (activates the SIM fix).
+5. Rooted variants: install the matching manager APK from this release's separate manager asset (BakaSU **35262** or KernelSU-Next **33548**), open it, then Modules → Install from storage → `/system/etc/a155f-extras/RILFix_A15.zip` (activates the SIM fix). The manager APK is deliberately not baked into the AP image.
 
 ## SIM bug fix (network drop every ~7 hours)
 
@@ -32,7 +32,7 @@ $SIMFIX_LINE
 - Kernel: project v1.0 release artifact, pinned SHA-256 verified at build time (never rebuilt).
 - GSI: upstream `cawilliamson/treble_restlessos` `$RTAG`, verified against its published sha512sum.
 - Firmware: stock Samsung `$FW_VERSION` ($FW_REGION).
-- SHA-256 of every part is in `SHA256SUMS.txt`.
+- SHA-256 of every part is in `${APBASE}.SHA256SUMS.txt`.
 
 ## Known limitations
 

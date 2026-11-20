@@ -18,8 +18,17 @@ on:
           - kernelsunext
           - vanilla
         default: bakasu
+      ap_base_variant:
+        description: "AP donor: stock firmware download, or reuse a verified AP variant already on the release"
+        type: choice
+        options:
+          - stock
+          - bakasu
+          - kernelsunext
+        default: stock
+        required: true
       fw_version:
-        description: "Stock firmware to base vendor/product/odm on"
+        description: "Stock firmware baseline represented by the AP donor"
         default: "A155FXXS7CYG4"
         required: true
       fw_region:
@@ -48,6 +57,7 @@ concurrency:
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   KERNEL_VARIANT: ${{ inputs.kernel_variant }}
+  AP_BASE_VARIANT: ${{ inputs.ap_base_variant }}
   FW_VERSION: ${{ inputs.fw_version }}
   FW_REGION: ${{ inputs.fw_region }}
   FW_URL: ${{ inputs.fw_url }}
@@ -108,18 +118,22 @@ jobs:
           set -o pipefail
           rom/fetch-inputs.sh gsi 2>&1 | tee work/fetch-gsi.log
 
-      - name: Fetch stock firmware (Samsung FUS, version-pinned)
+      - name: Fetch AP donor (stock firmware or verified release AP)
         run: |
           mkdir -p work
           set -o pipefail
-          rom/fetch-inputs.sh firmware 2>&1 | tee work/fetch-firmware.log
+          if [ "$AP_BASE_VARIANT" = stock ]; then
+            rom/fetch-inputs.sh firmware 2>&1 | tee work/fetch-firmware.log
+          else
+            rom/fetch-inputs.sh ap-base 2>&1 | tee work/fetch-ap-base.log
+          fi
 
       - name: Extract stock AP members
         run: |
           set -o pipefail
           rom/extract-ap.sh 2>&1 | tee work/step-extract.log
 
-      - name: Build RIL-fix module + manager APK
+      - name: Build RIL-fix module (manager APKs are separate release assets)
         run: |
           set -o pipefail
           rom/build-rilfix-module.sh 2>&1 | tee work/step-rilfix.log
@@ -149,20 +163,26 @@ jobs:
           set -o pipefail
           rom/render-notes.sh 2>&1 | tee work/step-notes.log
 
-      - name: Publish prerelease
+      - name: Publish variant assets without replacing existing release files
         run: |
-          set -e
+          set -euo pipefail
           cd out
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release edit "$RELEASE_TAG" --prerelease --notes-file RELEASE_NOTES.md
-          else
-            gh release create "$RELEASE_TAG" --prerelease \
-              --title "RestlessOS 17 (GrapheneOS fork) — SM-A155F — ${KERNEL_VARIANT} kernel (Odin AP)" \
-              --notes-file RELEASE_NOTES.md
+          # Do not edit an existing release's title, notes, prerelease status, or assets.
+          # The owner maintains the combined release description after all variants are ready.
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --title "RestlessOS 17 (GrapheneOS fork) — SM-A155F — ROM variants (Odin AP)" \
+              --notes "See repository README for variant details and installation guidance."
           fi
-          cd dist && sha256sum -c SHA256SUMS.txt >/dev/null && for f in *; do
-            echo "uploading $f"
-            gh release upload "$RELEASE_TAG" "$f" --clobber
+          cd dist
+          RTAG=$(cat ../../work/gsi/TAG)
+          APBASE="AP_SM-A155F_RestlessOS-${RTAG}_${KERNEL_VARIANT}_${FW_VERSION}"
+          SUMFILE="${APBASE}.SHA256SUMS.txt"
+          sha256sum -c "$SUMFILE" >/dev/null
+          for f in "${APBASE}.tar.md5."* "$SUMFILE"; do
+            [ -f "$f" ] || { echo "missing expected variant asset: $f"; exit 1; }
+            echo "uploading $f (no clobber)"
+            gh release upload "$RELEASE_TAG" "$f"
           done
           echo "DONE: $(gh release view "$RELEASE_TAG" --json url --jq .url)"
 

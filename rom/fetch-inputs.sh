@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fetches the three ROM inputs, one phase per invocation (or "all"):
-#   fetch-inputs.sh kernel|gsi|firmware|all
+#   fetch-inputs.sh kernel|gsi|firmware|ap-base|all
 #
 # NO kernel rebuild: the exact v1.0 release artifact is verified against the
 # pinned round-2 SHA-256.
@@ -162,11 +162,36 @@ do_firmware() {
   ls -la work/fw/
 }
 
+do_ap_base() {
+  BASE_VARIANT="${AP_BASE_VARIANT:-stock}"
+  case "$BASE_VARIANT" in
+    bakasu|kernelsunext) ;;
+    *) echo "FATAL: ap-base requires AP_BASE_VARIANT=bakasu or kernelsunext"; exit 1;;
+  esac
+  TAG="$RESTLESS_REF"
+  if [ -z "$TAG" ]; then
+    TAG=$(gh api repos/cawilliamson/treble_restlessos/releases/latest --jq .tag_name)
+  fi
+  BASE="AP_SM-A155F_RestlessOS-${TAG}_${BASE_VARIANT}_${FW_VERSION}"
+  SUM="${BASE}.SHA256SUMS.txt"
+  mkdir -p work/ap-base work/ap
+  echo "=== using existing $BASE as checksum-verified AP donor ==="
+  gh release download "$RELEASE_TAG" \
+    -p "${BASE}.tar.md5.*" -p "$SUM" -D work/ap-base
+  ( cd work/ap-base && sha256sum -c "$SUM" )
+  DONOR="work/ap/AP_${FW_VERSION}_donor.tar.md5"
+  cat "work/ap-base/${BASE}.tar.md5.00" \
+      "work/ap-base/${BASE}.tar.md5.01" \
+      "work/ap-base/${BASE}.tar.md5.02" > "$DONOR"
+  echo "verified donor AP assembled: $DONOR ($(stat -c%s "$DONOR") bytes)"
+}
+
 case "$PHASE" in
   kernel)   do_kernel;;
   gsi)      do_gsi;;
   firmware) do_firmware;;
-  all)      do_kernel; do_gsi; do_firmware;;
-  *) echo "usage: $0 kernel|gsi|firmware|all"; exit 1;;
+  ap-base)  do_ap_base;;
+  all)      do_kernel; do_gsi; if [ "${AP_BASE_VARIANT:-stock}" = stock ]; then do_firmware; else do_ap_base; fi;;
+  *) echo "usage: $0 kernel|gsi|firmware|ap-base|all"; exit 1;;
 esac
 echo "=== phase '$PHASE' done ==="
