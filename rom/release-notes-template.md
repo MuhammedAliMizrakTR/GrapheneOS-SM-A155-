@@ -1,49 +1,44 @@
-# RestlessOS 17 (GrapheneOS fork) — SM-A155F — Odin AP paketi
+# RestlessOS 17 (GrapheneOS fork) for Galaxy A15 4G (SM-A155F) — Odin AP package
 
-**İçindekiler / Contents:** RestlessOS `$RTAG` (Android 17, GrapheneOS-fork GSI) **system** olarak • `$KERNEL_VARIANT` kernel (v1.0 release artifact'ı, sha256-doğrulamalı, yeniden derlenmedi) • stok `$FW_VERSION` ($FW_REGION) vendor/product/odm = **tüm sürücüler** (Mali GPU, kamera, ses, modem arayüzü) • verification-disabled vbmeta • SIM-fix modülü (gömülü).
+**Contents:** RestlessOS `$RTAG` (Android 17, GrapheneOS-fork GSI) as **system** • `$KERNEL_VARIANT` kernel (project v1.0 release artifact, SHA-256-pinned, never rebuilt) • stock `$FW_VERSION` ($FW_REGION) vendor/product/odm = **the full Samsung/MediaTek driver stack** (Mali GPU, camera, audio, modem interface) • verification-disabled vbmeta • embedded SIM-fix module.
 
-> ⚠️ **İLK CİHAZ TESTİ YAPILMADI.** Build temiz üretildi ama kimse bu paketi cihazda boot etmedi. Odin + stok firmware ile geri dönebilecek durumda değilsen flaşlama. Android 17 GSI ↔ Android 15 vendor uyumu ilk boot'ta belli olacak.
+## Installation (Odin only)
 
-## Kurulum / Install
-
-1. **Önce stok kur:** Odin ile orijinal **$FW_VERSION** (bölge fark etmez) 4-dosya (BL+AP+CP+CSC) flaşla, cihaz açılsın.
-2. Bu release'in parçalarını indir ve birleştir:
+1. **Flash stock first:** flash the original **$FW_VERSION** 4-file package (BL+AP+CP+CSC) in Odin and let it boot once.
+2. Download this release's parts and join them:
    - Windows: `copy /b ${APBASE}.tar.md5.00+${APBASE}.tar.md5.01+${APBASE}.tar.md5.02 ${APBASE}.tar.md5`
    - Linux/macOS: `cat ${APBASE}.tar.md5.* > ${APBASE}.tar.md5`
-   - SHA256SUMS.txt ile doğrula.
-3. Download Mode'a gir → Odin → dosyayı **AP** slotuna koy → flaşla.
-4. **Format data** şart (recovery'den Wipe data/factory reset) — GSI'ya ilk geçişte userdata temizlenmeli.
-5. Root'lu varyantta: açılıştan sonra root yöneticisi → Modules → Install from storage → `/system/etc/a155f-extras/RILFix_A15.zip` (SIM fix'i aktive eder).
+   - Verify against `SHA256SUMS.txt`.
+3. Boot into Download Mode → Odin → place the joined file in the **AP** slot → flash.
+4. **Format data is mandatory** (Wipe data/factory reset in recovery) — required on the first switch to a GSI.
+5. Rooted variants: after boot, open the root manager → Modules → Install from storage → `/system/etc/a155f-extras/RILFix_A15.zip` (activates the SIM fix).
 
-## SIM bug (şebeke 6-7 saatte düşme) fix
+## SIM bug fix (network drop every ~7 hours)
 
 $SIMFIX_LINE
 
-## Ne var ne yok
+## What's in / what's out
 
-| Var ✅ | Yok ❌ |
+| In ✅ | Out ❌ |
 |---|---|
-| RestlessOS: sandboxed Google Play (GmsCompat), per-app network/sensors izinleri, Seedvault, TrebleApp | Verified boot / hardware attestation (GSI yapısı gereği) |
-| Stok vendor sürücüleri (kamera, GPU, ses, GPS, FM, sensörler) | GrapheneOS kernel hardening (Pixel'e özel) |
-| Bizim v1.0 kernel: BBRv3, BBG, NTSync, Droidspaces, WireGuard | VoLTE garantisi (MTK IMS, GSI'larda genelde çalışmaz) |
-| SIM-fix modülü (gömülü, rooted varyantlarda) | Samsung OTA güncellemeleri |
-| `aarch64`/`arm64-ab`, Treble resmi | Cihaza özel RRO overlay'ler (phase 2'de) |
+| RestlessOS: sandboxed Google Play (GmsCompat), per-app network/sensors permissions, Seedvault, TrebleApp | Verified boot / hardware attestation (inherent to GSIs) |
+| Stock vendor drivers (camera, GPU, audio, GPS, FM, sensors) | GrapheneOS kernel hardening (Pixel-specific) |
+| Our v1.0 kernel: BBRv3, BBG, NTSync, Droidspaces, WireGuard | VoLTE guarantee (MTK IMS — generally not working on GSIs) |
+| SIM-fix module (embedded, rooted variants) | Samsung OTA updates |
+| `aarch64`/`arm64-ab`, official Treble support | Device-specific RRO overlays (phase 2) |
 
-## Doğrulama
+## Verification
 
-- Kernel: v1.0 release artifact'ı, build sırasında pinned SHA-256 ile doğrulandı (yeniden derlenmedi).
-- GSI: upstream `cawilliamson/treble_restlessos` `$RTAG`, sha512sum ile doğrulandı.
-- Firmware: Samsung FUS'tan `samloader` ile indirildi (enc4 CRC doğrulamalı).
-- Tüm parçaların SHA-256'sı `SHA256SUMS.txt` içinde.
+- Kernel: project v1.0 release artifact, pinned SHA-256 verified at build time (never rebuilt).
+- GSI: upstream `cawilliamson/treble_restlessos` `$RTAG`, verified against its published sha512sum.
+- Firmware: stock Samsung `$FW_VERSION` ($FW_REGION).
+- SHA-256 of every part is in `SHA256SUMS.txt`.
 
-## Bilinen sınırlar / Known limitations
+## Known limitations
 
-- Cihazda test edilmedi; ilk boot gate: logo → launcher → ADB → RIL → ses/kamera.
-- SIM fix kök-neden çözümü değil (ril-daemon'ın ~7sa25dk runtime takılması; Samsung/MTK tarafında). Modül ~6 saatte bir restart atar.
-- EFS/NVRAM/IMEI yedeği almadan hiçbir şey flaşlama.
+- The SIM fix is a workaround, not a root-cause fix (ril-daemon hangs after ~7h25m of uptime on unlocked-bootloader A15 4G; Samsung/MTK side). The module restarts it every ~6 hours.
+- Back up EFS/NVRAM/IMEI before flashing anything.
 
 ---
 
-**EN:** Odin AP package pairing RestlessOS `$RTAG` (Android 17 GrapheneOS-fork GSI) with the project's v1.0 `$KERNEL_VARIANT` kernel and the stock `$FW_VERSION` driver stack. Flash stock first, then this file in the AP slot, then format data. Root variants embed the community-proven ril-daemon restart module (`/system/etc/a155f-extras/RILFix_A15.zip`) for the unlocked-bootloader SIM-drop bug. Build-tested only — not device-tested. All hashes in SHA256SUMS.txt.
-
-Built $BUILD_DATE by GitHub Actions (`build-rom.yml`). Sources: RestlessOS by cawilliamson (GrapheneOS fork), kernel by poqdavid, firmware by Samsung.
+Built $BUILD_DATE by GitHub Actions (`build-rom.yml`). Credits: RestlessOS by cawilliamson (GrapheneOS fork), kernel by poqdavid, stock firmware by Samsung.

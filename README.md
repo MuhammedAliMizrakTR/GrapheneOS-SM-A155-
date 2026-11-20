@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/main/assets/rom-banner.png" alt="RestlessOS 17 for Galaxy A15 4G" width="720">
+</p>
+
 # SM-A155F Privacy Project — Custom Kernels + RestlessOS (GrapheneOS-based)
 
 Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x).
@@ -5,6 +9,30 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 > ⚠️ **Status: build-tested, NOT device-tested.** Kernels compile, repack, and sign cleanly; nobody has booted them on hardware yet. Unlocked bootloader required. You flash at your own risk — keep your stock `boot.img` to recover.
 
 ---
+
+---
+
+## 📱 THE ROM IS OUT — RestlessOS 17 (GrapheneOS fork) for Galaxy A15 4G
+
+**Download:** [Release rom-v1.0 — *1.1 ROM Initial Build*](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)
+
+A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17, GrapheneOS-fork GSI — sandboxed Google Play, per-app network/sensors permissions, Seedvault, TrebleApp) with this project's v1.0 kernels and the **untouched stock driver stack** (camera, Mali GPU, audio, GPS, FM, sensors) from Samsung's `A155FXXS7CYG4` firmware. Single **AP** package — no fastbootd, no manual partition juggling.
+
+**What the build does** (fully automated by [`build-rom.yml`](.github/workflows/build-rom.yml)):
+
+1. Fetches the pinned v1.0 kernel artifact (SHA-256-verified), the RestlessOS GSI (SHA-512-verified), and the stock firmware.
+2. Unpacks the stock `super.img`, swaps **system** for the RestlessOS GSI, keeps **vendor/product/odm** byte-identical (all drivers preserved), and rebuilds super with `lpmake`.
+3. Embeds the **SIM-fix module** (`RILFix_A15`, rooted variants) at `/system/etc/a155f-extras/` — the community-proven workaround for the ~7h25m ril-daemon hang on unlocked A15 4G.
+4. Generates verification-disabled `vbmeta`/`vbmeta_system` (avb flags 3) so the modified images boot.
+5. Repacks everything into a stock-layout Odin `AP_*.tar.md5` (member order preserved), split into <2 GB parts with SHA-256 sums.
+
+| Variant | Root manager | SIM fix |
+|---|---|---|
+| **bakasu** | ReSukiSU (BakaSU) | ✅ embedded |
+| **kernelsunext** | KernelSU-Next | ✅ embedded |
+| **vanilla** | — (unrooted) | ❌ not possible |
+
+**Install:** flash stock `A155FXXS7CYG4` (BL+AP+CP+CSC) in Odin → join the 3 parts (`copy /b` on Windows / `cat` on Linux) → flash the joined tar in the **AP** slot → **format data**. Full guide + verification hashes are in the [release notes](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0).
 
 ## 🔧 Kernels — v1.0 Initial Build
 

@@ -18,9 +18,12 @@ case "$KERNEL_VARIANT" in
 esac
 
 if [ -n "${MGR_REPO:-}" ]; then
-  TAG=$(gh api "repos/$MGR_REPO/releases/latest" --jq .tag_name)
-  ASSET=$(gh api "repos/$MGR_REPO/releases/tags/$TAG" --jq '.assets[].name' \
-    | grep -E "$MGR_PAT" | grep -v -i spoof | head -1)
+  # NOTE: /releases/latest 404s when every release is a prerelease (BakaSU).
+  TAG=$(gh api "repos/$MGR_REPO/releases?per_page=20" --jq '[.[] | select(.draft|not)][0].tag_name')
+  [ -n "$TAG" ] && [ "$TAG" != "null" ] || { echo "FATAL: no releases on $MGR_REPO"; exit 1; }
+  MLIST=$(gh api "repos/$MGR_REPO/releases/tags/$TAG" --jq '.assets[].name')
+  ASSET=$(printf '%s\n' "$MLIST" | grep -E "$MGR_PAT" | grep -v -i spoof | head -1 || true)
+  [ -n "$ASSET" ] || { echo "FATAL: no manager apk matching $MGR_PAT; assets:"; printf '%s\n' "$MLIST"; exit 1; }
   echo "manager: $MGR_REPO $TAG / $ASSET"
   gh release download "$TAG" -R "$MGR_REPO" -p "$ASSET" -D work/manager --clobber
   cp "work/manager/$ASSET" out/dist/

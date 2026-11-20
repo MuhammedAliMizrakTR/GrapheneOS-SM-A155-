@@ -55,3 +55,9 @@ __pycache__/
 # Ignore rules are not a security boundary. Review staged files and licenses.
 # Track reviewed sanitized logs under a deliberate alternative path if needed.
 # Public certificates/test artifacts may need explicit review before being added.
+
+# ROM build scratch (rom/tools.sh + pipeline)
+tools/
+work/
+out/
+image-search/

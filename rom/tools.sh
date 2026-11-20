@@ -37,11 +37,11 @@ if [ ! -f tools/avb/avbtool.py ]; then
 fi
 
 echo "[tools] verifying"
-lpmake --version >/dev/null 2>&1 || lpmake 2>&1 | grep -q "command-line tool"
-lpdumps 2>&1 | grep -q "dumping Android Logical Partition"
+out=$(lpmake 2>&1 || true); echo "$out" | grep -q "command-line tool" || { echo "lpmake FAIL"; exit 1; }
+out=$(lpdumps 2>&1 || true); echo "$out" | grep -q "dumping Android Logical Partition" || { echo "lpdumps FAIL"; exit 1; }
 lz4 --version
 debugfs -V 2>&1 | head -1
-python3 tools/avb/avbtool.py --version 2>/dev/null || python3 tools/avb/avbtool.py 2>&1 | head -1
-python3 rom/simg2img.py 2>&1 | head -1 || true
+test -f tools/avb/avbtool.py && echo "avbtool OK"
+test -f rom/simg2img.py && echo "simg2img.py OK"
 echo "[tools] READY"
 echo "export PATH=$(pwd)/tools/lptools/linux_glibc_x86_64:$(pwd)/tools/lz4:$(pwd)/tools/e2fsprogs/b/misc:$(pwd)/tools/e2fsprogs/b/debugfs:$(pwd)/tools/e2fsprogs/b/e2fsck:$(pwd)/tools/e2fsprogs/b/resize:\$PATH"
