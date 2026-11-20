@@ -161,7 +161,7 @@ jobs:
               --notes "See repository README for variant details and installation guidance."
           fi
           cd dist
-          RTAG=$(cat ../work/gsi/TAG)
+          RTAG=$(cat ../../work/gsi/TAG)
           APBASE="AP_SM-A155F_RestlessOS-${RTAG}_${KERNEL_VARIANT}_${FW_VERSION}"
           SUMFILE="${APBASE}.SHA256SUMS.txt"
           sha256sum -c "$SUMFILE" >/dev/null

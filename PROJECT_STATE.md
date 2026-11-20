@@ -4,14 +4,15 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint (2026-11-18)
 
-**ROM release `rom-v1.0` already exists; preparing additive Vanilla (unrooted) and KernelSU-Next ROM AP variants. No new AP build has run yet.** Working branch: `arena/31ec40b0-grapheneos-sm-a155`.
+**ROM release `rom-v1.0` already exists; additive Vanilla and KernelSU-Next AP variants are in progress. Vanilla AP packaged successfully in Actions, but its first publishing step failed due to a wrong relative path; no new release asset was uploaded.** Working branch: `arena/31ec40b0-grapheneos-sm-a155`.
 
 - Confirmed existing `rom-v1.0` assets before changes: three BakaSU AP split parts, `BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk`, `RILFix_A15.zip`, and `SHA256SUMS.txt`. Do not delete, replace, or clobber any of them.
 - User requests two additional ROM packages: `vanilla` (unrooted) and `kernelsunext` (KernelSU-Next 33548); user will upload the matching KernelSU-Next manager APK separately at the end.
 - Workflow changes are being made to upload each variant's AP parts and unique checksum manifest only, without editing an existing release's body/status/title or overwriting any assets.
 - Manager APKs will not be embedded in future AP images. This avoids stale version mismatch; install the matching release APK separately. Vanilla has no root manager and no SIM-fix capability.
 - After both AP builds/assets are verified, update the release description and README with the variant matrix and accurate download/install steps. KernelSU-Next manager APK upload remains owner-deferred.
-- **Not yet done:** workflow runs, produced AP files, release uploads, release description edit, final README variant links, device validation.
+- **Done in CI (not published):** Vanilla AP was assembled/split and its unique checksum manifest verified; the publish step then failed because it looked for `work/gsi/TAG` at the wrong relative path. This is corrected on the branch and will be re-run. The KSN run is held until the corrected workflow is in place.
+- **Not yet done:** successful release uploads, KSN AP completion, release description edit, final README variant links, device validation.
 
 ## Historical checkpoint
 
