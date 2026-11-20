@@ -61,10 +61,7 @@ A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17,
 
 ### Root manager apps (install after flashing a rooted variant)
 
-| Variant | Manager | Link |
-|---|---|---|
-| BakaSU | BakaSU (ex-ReSukiSU) manager — pick the `arm64-v8a` APK | [Baka-SU/BakaSU releases](https://github.com/Baka-SU/BakaSU/releases/latest) |
-| KernelSU-Next | KernelSU-Next manager (v3.4.2 or newer) | [KernelSU-Next/KernelSU-Next releases](https://github.com/KernelSU-Next/KernelSU-Next/releases/latest) |
+The matching manager APK ships **inside the ROM release** (see the [rom-v1.0 release](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)) — use that one, not a random upstream build, so the manager version matches the kernel-side driver (BakaSU 35262 / KernelSU-Next 33548). Sources: [Baka-SU/BakaSU](https://github.com/Baka-SU/BakaSU) · [KernelSU-Next/KernelSU-Next](https://github.com/KernelSU-Next/KernelSU-Next)
 
 ---
 
