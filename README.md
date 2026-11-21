@@ -6,19 +6,25 @@
 
 Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x)!!!.
 
-> ⚠️ **Status: build-tested, A155F device-tested.** Kernels compile, repack, booted on A155F and sign cleanly; nobody has booted them on other A15 hardware yet. Testers needeed! Unlocked bootloader required. You flash at your own risk — keep your stock `boot.img` to recover.
+> ⚠️ **ROM 1.1 WITHDRAWN — DO NOT FLASH.** The first on-device trial of the BakaSU ROM reported an MD5 mismatch and an Odin write failure at `super.img`, with `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The 1.1 release has been moved to prerelease status and its assets are retained only for investigation. The other 1.1 variants are also not verified as flashable. Release 1.2 is not ready; it requires a matching bootloader/firmware revision and a rebuilt plain `.tar` (no MD5 footer, no LZ4-compressed members, no split parts).
 
 ---
 
 ---
 
-## 📱 THE ROM IS OUT — RestlessOS 17 (GrapheneOS fork) for Galaxy A15 4G
+## 📱 ROM Release Status — 1.1 withdrawn; 1.2 verification rebuild pending
 
-**Download:** [Release rom-v1.0 — *1.1 ROM Initial Build*](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)
+**Archived 1.1 release:** [rom-v1.0 — *1.1 ROM Initial Build* (prerelease; DO NOT FLASH)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)
 
-A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17, GrapheneOS-fork GSI — sandboxed Google Play, per-app network/sensors permissions, Seedvault, TrebleApp) with this project's v1.0 kernels and the **untouched stock driver stack** (camera, Mali GPU, audio, GPS, FM, sensors) from Samsung's `A155FXXS7CYG4` firmware. Single **AP** package — no fastbootd, no manual partition juggling.
+The first BakaSU ROM test on the maintainer's phone failed at the `super.img` write. The reported Odin log includes an MD5 mismatch and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`; this is not evidence that changing archive compression alone will fix the firmware rollback-revision mismatch. All 1.1 ROM assets are being retained for investigation, not recommended for installation. The 1.2 BakaSU package is being rebuilt only after the exact device firmware/build revision and a compatible donor image are confirmed.
 
-**What the build does** (fully automated by [`build-rom.yml`](.github/workflows/build-rom.yml)):
+The requested 1.2 packaging target is **one plain `.tar` file**: no appended MD5 footer, no LZ4-compressed members, and no split parts. The release-hosting route for this multi-gigabyte single file still needs confirmation; GitHub Release assets have a per-file size limit, so do not assume the resulting tar can be attached as one release asset.
+
+### Historical 1.1 package details (do not flash)
+
+The attempted 1.1 bundle paired **RestlessOS 17** (Android 17, unofficial GrapheneOS-fork GSI) with project v1.0 kernels and Samsung `A155FXXS7CYG4` vendor/driver images. The 1.1 result failed the reported device flash test; this history is retained for debugging only.
+
+**Historical 1.1 build pipeline** (retained for investigation; not approved for flashing):
 
 1. Fetches the pinned v1.0 kernel artifact (SHA-256-verified), the RestlessOS GSI (SHA-512-verified), and the stock firmware.
 2. Unpacks the stock `super.img`, swaps **system** for the RestlessOS GSI, keeps **vendor/product/odm** byte-identical (all drivers preserved), and rebuilds super with `lpmake`.
@@ -32,9 +38,9 @@ A complete, Odin-flashable privacy ROM that pairs **RestlessOS 17** (Android 17,
 | **kernelsunext** | KernelSU-Next rooted kernel | [`.00`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_kernelsunext_A155FXXS7CYG4.tar.md5.00) · [`.01`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_kernelsunext_A155FXXS7CYG4.tar.md5.01) · [`.02`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_kernelsunext_A155FXXS7CYG4.tar.md5.02) · [manifest](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_kernelsunext_A155FXXS7CYG4.SHA256SUMS.txt) | KernelSU-Next **33548**, separate asset (maintainer upload pending) | ✅ module included; install it from the manager after boot |
 | **vanilla** | Stock-optimized kernel, **unrooted** | [`.00`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_vanilla_A155FXXS7CYG4.tar.md5.00) · [`.01`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_vanilla_A155FXXS7CYG4.tar.md5.01) · [`.02`](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_vanilla_A155FXXS7CYG4.tar.md5.02) · [manifest](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/download/rom-v1.0/AP_SM-A155F_RestlessOS-17.0.0-202611021750_vanilla_A155FXXS7CYG4.SHA256SUMS.txt) | None | ❌ unavailable without root |
 
-**Download:** the [rom-v1.0 / 1.1 release](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) now contains all three complete AP packages (each split into `.00`, `.01`, `.02`) and a checksum manifest per variant. Select one kernel variant only; do not mix parts from different names. The BakaSU package retains the original release checksum file; Vanilla and KernelSU-Next each have a variant-specific `*.SHA256SUMS.txt`.
+**Archived assets only:** the linked rows below identify the 1.1 files for troubleshooting. They are marked **DO NOT FLASH**; their checksum manifests do not establish that the package is compatible with the device's fused binary revision.
 
-**Install:** on **SM-A155F only**, flash stock `A155FXXS7CYG4` 4-file firmware (BL+AP+CP+CSC) in Odin and boot once. Join the three parts with the exact same filename stem (`copy /b` on Windows, `cat` on Linux/macOS), verify SHA-256 using that variant's manifest, then flash the joined `.tar.md5` in Odin's **AP** slot and format data. Rooted variants: install their exact matching manager APK as a separate release asset; no manager APK is embedded in any AP. The KernelSU-Next 33548 manager attachment is still pending. After boot, install `/system/etc/a155f-extras/RILFix_A15.zip` from the root manager to enable the included SIM workaround. Vanilla is unrooted and cannot install it. See the release notes for full steps and limitations.
+**Installation:** 1.1 installation steps are intentionally withdrawn. Do not join or flash these files. Release 1.2 instructions will be published only after a firmware-revision-matched package is built and reviewed.
 
 ## 🔧 Kernels — v1.0 Initial Build
 
