@@ -38,10 +38,10 @@ pipeline runs there:
 | 4 | `modify-gsi.sh` | embeds `/system/etc/a155f-extras/` (module zip, manager APK, README) into the GSI (ext4 mount or erofs repack) |
 | 5 | `repack-super.sh` + `lp_plan.py` | `lpdump`/`lpunpack` stock super, `lpmake` a new sparse super: **system = GSI**, vendor/product/odm/… = stock bytes, stock geometry preserved |
 | 6 | `make-vbmeta.sh` | `avbtool make_vbmeta_image --flags 3` for every `vbmeta*` member (the standard "vbmeta_disabled") |
-| 7 | `pack-ap.sh` | reassembles the AP tar with stock member names/order, md5-appends (`.tar.md5`), splits at 1900 MB for release-asset limits, writes SHA256SUMS |
-| 8 | `render-notes.sh` | bilingual release notes |
+| 7 | `pack-ap.sh` | reassembles one plain `.tar` with raw/uncompressed image members; no MD5 footer and no `.lz4` members. It may split the tar into numbered transport parts for release hosting; joining restores the exact TAR. Writes a manifest for the whole TAR and each part. |
+| 8 | `render-notes.sh` | English 1.2 test-candidate notes, including the firmware-revision gate |
 
-Outputs land on the selected GitHub release (`rom-v1.0` by default): split AP parts and a variant-specific `${APBASE}.SHA256SUMS.txt`. Publishing is additive: existing release title, description, status, and assets are not overwritten. Manager APKs are separate release assets so a stale or mismatched APK can never be silently embedded in a ROM.
+The 1.2 workflow targets `rom-v1.2` as a prerelease candidate. It only publishes numbered transport chunks plus a SHA-256 manifest (no `.tar.md5`, no LZ4). Existing releases/assets are never clobbered. Manager APKs remain separate assets.
 
 ## Toolchain (no apt needed)
 

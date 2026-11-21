@@ -7,9 +7,10 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 **1.1 ROM release `rom-v1.0` has been withdrawn from use and changed to a prerelease after the owner's first-device BakaSU trial failed.** The reported failures are MD5 mismatch, LZ4 handling concern, Odin write failure at `super.img`, and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. No corrected 1.2 package has been built or released. Working branch: `arena/15d824a8-grapheneos-sm-a155`.
 
 - User explicitly requests README in English to label 1.1 broken / do not flash, and 1.1 release to be prerelease. **Done:** release title/body updated; all 14 original assets retained. README carries the warning and withdraws install steps pending 1.2.
-- User's 1.2 BakaSU packaging requirements: one plain `.tar`, no appended MD5, no LZ4-compressed members, no splitting. Must be based on firmware compatible with the device's fused binary revision; exact installed firmware/donor build has not yet been supplied.
-- A multi-gigabyte plain tar likely exceeds GitHub Release's per-asset limit; no alternative single-file release host is confirmed. No output artifact or release 1.2 exists.
-- **Blocking inputs:** exact model and full current firmware/build/baseband string, and a matching 4-file firmware package/donor; distribution choice for the single unsplit tar (e.g. Actions artifact vs. external destination).
+- Owner clarified the handset is on `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in connected Drive. The corresponding 1.1 KernelSU-Next AP donor is already on `rom-v1.0`, checksum-manifested, and can be reused for a BakaSU candidate without a fresh multi-GB Drive download.
+- 1.2 packaging requirements: one plain `.tar`, no appended MD5 footer, no LZ4-compressed members. Owner allows numbered transport chunks (`.00`, `.01`, …) if a single Drive upload is not possible; joining must restore one exact TAR.
+- GitHub Release per-asset limits prevent a multi-GB single file, and the Drive connector upload tool caps binary files at 100 MB; fallback is numbered release assets unless the user supplies another destination.
+- **Remaining safety clarification:** reported `Fused 7 > Binary 8` conflicts with the owner's binary-7 CYG4 statement. Do not advise flashing until the exact line/model/build is reconciled. 1.2 not yet built or released.
 - Earlier CI builds of BakaSU/KSN/Vanilla AP archives (Actions runs `44744378880`, `44748382860`) are now considered unverified for flashing; their 1.1 assets remain available only for investigation, not endorsement.
 - No 1.2 build, on-device retest, or partition write has been performed by this agent.
 

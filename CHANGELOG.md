@@ -7,8 +7,8 @@ This file records meaningful changes and validation outcomes. Entries are not pr
 - Owner reported the first BakaSU ROM test failed with MD5 mismatch, LZ4 handling problem, and Odin write failure at `super.img`: `SW REV CHECK FAIL [super] Fused 7 > Binary 8` / `Complete(Write) operation failed.` Agent has not independently reproduced the flash.
 - Marked existing release `rom-v1.0` (display name 1.1 ROM Initial Build) as prerelease; retitled it **WITHDRAWN / DO NOT FLASH** and replaced release notes with an English failure notice. Verified all original 14 assets remain; no asset was deleted.
 - README now warns against all 1.1 variants, withdraws installation steps, and states the 1.2 package is pending exact firmware/rollback revision matching.
-- 1.2 packaging target from owner: one plain `.tar`, no MD5 footer, no LZ4-compressed members, no splitting. No corrected archive has been built.
-- Blockers: exact model and full current firmware/build/baseband and fused revision, matching binary-8 firmware/AP donor, and a host for the unsplit multi-GB tar (GitHub release per-asset limit may block attachment). No 1.2 release is claimed.
+- Owner clarified their handset is `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in Drive; the checksum-verified 1.1 KSN AP donor can be reused as the exact CYG4 source. Requested 1.2 format: plain `.tar`, no appended MD5, no LZ4-compressed members. Owner allows numbered `.00`/`.01` transport chunks if a single Drive upload is unavailable.
+- The reported `Fused 7 > Binary 8` remains inconsistent with the stated binary-7 device; do not claim rollback compatibility or ask the user to flash until the exact Odin line/build is confirmed. GitHub release single-file limits and Drive connector's 100 MB upload cap require split release assets as fallback. No 1.2 build/release yet.
 
 ## 2026-11-18 — Prepare additive ROM variant publishing (builds not yet run)
 

@@ -1,9 +1,9 @@
 name: Build A155F ROM (RestlessOS 17 + v1.0 kernel → Odin AP)
 
-# One-shot ROM packager for SM-A155F:
-#   stock CYG4 firmware (Samsung FUS, version-pinned) + RestlessOS 17 GSI
-#   + our already-released v1.0 kernel (sha256-pinned, NOT rebuilt)
-#   → single Odin-flashable AP tar(.md5), split for GitHub release limits.
+# Legacy workflow now produces the 1.2 BakaSU candidate format:
+#   verified CYG4 AP donor + RestlessOS 17 GSI + v1.0 kernel
+#   → plain TAR (no appended MD5, no LZ4 members), optionally transport-split
+#     for GitHub's per-asset limit. Join chunks to restore one TAR.
 #
 # See docs/ROM_BUILD.md for architecture and user flashing guide.
 
@@ -42,9 +42,13 @@ on:
       restless_ref:
         description: "treble_restlessos release tag (empty = latest)"
         default: ""
-      release_tag:
-        description: "Tag of the prerelease that receives the ROM package"
+      ap_base_release_tag:
+        description: "Existing release tag containing the checksum-verified AP donor"
         default: "rom-v1.0"
+        required: true
+      release_tag:
+        description: "Tag of the 1.2 prerelease that receives the transport parts"
+        default: "rom-v1.2"
         required: true
 
 permissions:
@@ -58,6 +62,7 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   KERNEL_VARIANT: ${{ inputs.kernel_variant }}
   AP_BASE_VARIANT: ${{ inputs.ap_base_variant }}
+  AP_BASE_RELEASE_TAG: ${{ inputs.ap_base_release_tag }}
   FW_VERSION: ${{ inputs.fw_version }}
   FW_REGION: ${{ inputs.fw_region }}
   FW_URL: ${{ inputs.fw_url }}
@@ -138,6 +143,14 @@ jobs:
           set -o pipefail
           rom/build-rilfix-module.sh 2>&1 | tee work/step-rilfix.log
 
+      - name: Fetch matching BakaSU 35262 manager APK (separate asset, not embedded)
+        if: inputs.kernel_variant == 'bakasu'
+        run: |
+          mkdir -p out/dist
+          gh release download rom-v1.0 \
+            -p 'BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk' \
+            -D out/dist
+
       - name: Modify GSI (embed extras)
         run: |
           set -o pipefail
@@ -170,19 +183,27 @@ jobs:
           # Do not edit an existing release's title, notes, prerelease status, or assets.
           # The owner maintains the combined release description after all variants are ready.
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" \
-              --title "RestlessOS 17 (GrapheneOS fork) — SM-A155F — ROM variants (Odin AP)" \
-              --notes "See repository README for variant details and installation guidance."
+            gh release create "$RELEASE_TAG" --prerelease \
+              --title "1.2 ROM Verification & Corruption Fix — BakaSU (Odin AP candidate)" \
+              --notes "Verification candidate. See repository README. Device/rollback compatibility still requires owner testing."
           fi
           cd dist
           RTAG=$(cat ../../work/gsi/TAG)
           APBASE="AP_SM-A155F_RestlessOS-${RTAG}_${KERNEL_VARIANT}_${FW_VERSION}"
           SUMFILE="${APBASE}.SHA256SUMS.txt"
-          sha256sum -c "$SUMFILE" >/dev/null
-          for f in "${APBASE}.tar.md5."* "$SUMFILE"; do
+          # Line 1 verifies the joined TAR (not present in this directory); the
+          # remaining lines verify every unsplit-transport part before upload.
+          tail -n +2 "$SUMFILE" | sha256sum -c - >/dev/null
+          for f in "${APBASE}.tar."* "$SUMFILE"; do
             [ -f "$f" ] || { echo "missing expected variant asset: $f"; exit 1; }
             echo "uploading $f (no clobber)"
             gh release upload "$RELEASE_TAG" "$f"
+          done
+          for f in RILFix_A15.zip BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk; do
+            if [ -f "$f" ]; then
+              echo "uploading supplemental asset $f (no clobber)"
+              gh release upload "$RELEASE_TAG" "$f"
+            fi
           done
           echo "DONE: $(gh release view "$RELEASE_TAG" --json url --jq .url)"
 

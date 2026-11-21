@@ -18,7 +18,7 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 
 The first BakaSU ROM test on the maintainer's phone failed at the `super.img` write. The reported Odin log includes an MD5 mismatch and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`; this is not evidence that changing archive compression alone will fix the firmware rollback-revision mismatch. All 1.1 ROM assets are being retained for investigation, not recommended for installation. The 1.2 BakaSU package is being rebuilt only after the exact device firmware/build revision and a compatible donor image are confirmed.
 
-The requested 1.2 packaging target is **one plain `.tar` file**: no appended MD5 footer, no LZ4-compressed members, and no split parts. The release-hosting route for this multi-gigabyte single file still needs confirmation; GitHub Release assets have a per-file size limit, so do not assume the resulting tar can be attached as one release asset.
+The 1.2 package itself is **one plain `.tar`**: no appended MD5 footer and no LZ4-compressed members. If Google Drive cannot accept the multi-gigabyte file, the release may carry numbered transport chunks (`.00`, `.01`, …); joining them must reproduce the single TAR exactly. The error log's `Fused 7 > Binary 8` line still conflicts with the owner's stated CYG4 XSG / binary-7 handset baseline and must be reconciled before any flash.
 
 ### Historical 1.1 package details (do not flash)
 

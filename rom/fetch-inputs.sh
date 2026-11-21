@@ -176,7 +176,8 @@ do_ap_base() {
   SUM="${BASE}.SHA256SUMS.txt"
   mkdir -p work/ap-base work/ap
   echo "=== using existing $BASE as checksum-verified AP donor ==="
-  gh release download "$RELEASE_TAG" \
+  SOURCE_RELEASE="${AP_BASE_RELEASE_TAG:-rom-v1.0}"
+  gh release download "$SOURCE_RELEASE" \
     -p "${BASE}.tar.md5.*" -p "$SUM" -D work/ap-base
   ( cd work/ap-base && sha256sum -c "$SUM" )
   DONOR="work/ap/AP_${FW_VERSION}_donor.tar.md5"

@@ -1,44 +1,32 @@
-# RestlessOS 17 (GrapheneOS fork) for Galaxy A15 4G (SM-A155F) — Odin AP package
+# 1.2 ROM Verification & Corruption Fix — RestlessOS 17 for Galaxy A15 4G (SM-A155F)
 
-**Contents:** RestlessOS `$RTAG` (Android 17, GrapheneOS-fork GSI) as **system** • `$KERNEL_VARIANT` kernel (project v1.0 release artifact, SHA-256-pinned, never rebuilt) • stock `$FW_VERSION` ($FW_REGION) vendor/product/odm = **the full Samsung/MediaTek driver stack** (Mali GPU, camera, audio, modem interface) • verification-disabled vbmeta • embedded SIM-fix module.
+**Status: prerelease / test candidate.** This rebuild targets the owner's reported `A155FXXS7CYG4` XSG (binary 7) base and changes the AP container format after the failed 1.1 report. It is not claimed device-verified.
 
-## Installation (Odin only)
+**Package:** RestlessOS `$RTAG` (Android 17 GSI) • `$KERNEL_VARIANT` kernel (v1.0 release artifact, SHA-256 pinned) • `$FW_VERSION` donor vendor/driver stack • raw `boot.img`, `super.img`, and other image members. The AP is a plain TAR: **no appended MD5, no LZ4-compressed members**. If release transport is chunked, `.00`, `.01`, … are only transport chunks; joining them restores one TAR.
 
-1. **Flash stock first:** flash the original **$FW_VERSION** 4-file package (BL+AP+CP+CSC) in Odin and let it boot once.
-2. Download this release's parts and join them:
-   - Windows: `copy /b ${APBASE}.tar.md5.00+${APBASE}.tar.md5.01+${APBASE}.tar.md5.02 ${APBASE}.tar.md5`
-   - Linux/macOS: `cat ${APBASE}.tar.md5.* > ${APBASE}.tar.md5`
-   - Verify against `${APBASE}.SHA256SUMS.txt`.
-3. Boot into Download Mode → Odin → place the joined file in the **AP** slot → flash.
-4. **Format data is mandatory** (Wipe data/factory reset in recovery) — required on the first switch to a GSI.
-5. Rooted variants: install the matching manager APK from this release's separate manager asset (BakaSU **35262** or KernelSU-Next **33548**), open it, then Modules → Install from storage → `/system/etc/a155f-extras/RILFix_A15.zip` (activates the SIM fix). The manager APK is deliberately not baked into the AP image.
+## Download and verify
 
-## SIM bug fix (network drop every ~7 hours)
+- Variant: **BakaSU rooted**
+- Download all same-prefix `${APBASE}.tar.00`, `${APBASE}.tar.01`, … parts and `${APBASE}.SHA256SUMS.txt`.
+- Linux/macOS: `cat ${APBASE}.tar.* > ${APBASE}.tar`
+- Windows: join all `.tar.00`, `.tar.01`, … parts in numeric order using binary concatenation. Use PowerShell or `copy /b` with every part named explicitly.
+- Verify each part using the manifest, then verify the joined `${APBASE}.tar` against the first manifest line.
 
-$SIMFIX_LINE
+## IMPORTANT firmware / rollback gate
 
-## What's in / what's out
+The 1.1 report contained `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The owner reports the handset is on `A155FXXS7CYG4` XSG / binary 7, which does not obviously agree with that line. **Before flashing, compare the phone's complete model/build/baseband/bootloader information with the donor firmware. Do not proceed if the displayed fused/binary revision is not an exact compatible match.** Removing MD5/LZ4 does not by itself fix Samsung rollback protection.
 
-| In ✅ | Out ❌ |
-|---|---|
-| RestlessOS: sandboxed Google Play (GmsCompat), per-app network/sensors permissions, Seedvault, TrebleApp | Verified boot / hardware attestation (inherent to GSIs) |
-| Stock vendor drivers (camera, GPU, audio, GPS, FM, sensors) | GrapheneOS kernel hardening (Pixel-specific) |
-| Our v1.0 kernel: BBRv3, BBG, NTSync, Droidspaces, WireGuard | VoLTE guarantee (MTK IMS — generally not working on GSIs) |
-| SIM-fix module (embedded, rooted variants) | Samsung OTA updates |
-| `aarch64`/`arm64-ab`, official Treble support | Device-specific RRO overlays (phase 2) |
+## Installation (only after the firmware gate is confirmed)
 
-## Verification
+1. On **SM-A155F only**, flash the matching stock four-file BL+AP+CP+CSC firmware in Odin and boot it once.
+2. Join the matching parts above into the `.tar`, verify its SHA-256, and select that `.tar` in Odin's AP slot.
+3. After a successful flash, format data/factory-reset from recovery before first boot.
+4. Install the matching BakaSU **35262** manager APK separately from the release. The manager is not baked into the AP. Install `/system/etc/a155f-extras/RILFix_A15.zip` from the manager's Modules screen only if the rooted SIM workaround is desired.
 
-- Kernel: project v1.0 release artifact, pinned SHA-256 verified at build time (never rebuilt).
-- GSI: upstream `cawilliamson/treble_restlessos` `$RTAG`, verified against its published sha512sum.
-- Firmware: stock Samsung `$FW_VERSION` ($FW_REGION).
-- SHA-256 of every part is in `${APBASE}.SHA256SUMS.txt`.
+## Scope and limitations
 
-## Known limitations
+- This is an unofficial RestlessOS / GrapheneOS-fork GSI package, not an official GrapheneOS port.
+- The Samsung/MediaTek vendor and driver stack remains stock; VoLTE/IMS and device-specific hardware functions require on-device validation.
+- This release is a **test candidate**, not confirmation that the prior Odin/SW revision issue is resolved. Retest only after checking the exact build/revision and keep a stock recovery path.
 
-- The SIM fix is a workaround, not a root-cause fix (ril-daemon hangs after ~7h25m of uptime on unlocked-bootloader A15 4G; Samsung/MTK side). The module restarts it every ~6 hours.
-- Back up EFS/NVRAM/IMEI before flashing anything.
-
----
-
-Built $BUILD_DATE by GitHub Actions (`build-rom.yml`). Credits: RestlessOS by cawilliamson (GrapheneOS fork), kernel by poqdavid, stock firmware by Samsung.
+Built $BUILD_DATE by GitHub Actions (`build-rom.yml`). Credits: RestlessOS by cawilliamson, A155F kernel by poqdavid, stock firmware by Samsung.

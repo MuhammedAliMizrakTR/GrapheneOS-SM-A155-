@@ -89,8 +89,10 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Status: **Accepted (owner-reported and directed)**.
 - Reported on-device outcome: 1.1 BakaSU package failed with MD5 mismatch and Odin write failure at `super.img`; exact log includes `SW REV CHECK FAIL [super] Fused 7 > Binary 8` and `Complete(Write) operation failed.` This is user evidence; the agent has not independently flashed/reproduced it.
 - Action: mark 1.1 / tag `rom-v1.0` as a prerelease, label it withdrawn / do not flash, retain all existing assets, and document the failure in English. This was completed.
-- 1.2 target packaging (owner-directed): one unsplit plain `.tar`, no MD5 footer, no LZ4-compressed members. Do not claim it fixes rollback mismatch until the exact device firmware/build and binary revision are verified and the matching donor firmware is used.
-- Blockers before building/publishing: exact model + full installed firmware/build/baseband and binary/bootloader revision; matching full firmware/AP donor; compatible hosting for a likely multi-gigabyte single tar (GitHub Release per-asset limit may prevent direct attachment). No 1.2 artifact is available yet.
+- Owner follow-up: handset is reported as `A155FXXS7CYG4` XSG / binary 7; matching full SamFW firmware ZIP is in connected Drive. A checksum-verified KSN AP donor exists on `rom-v1.0` and can be reused for a BakaSU rebuild.
+- 1.2 target packaging (owner-directed): plain `.tar`, no MD5 footer, no LZ4-compressed image members. Owner permits numbered transport chunks only if a single Drive upload is unavailable; joining them must restore exactly one TAR.
+- Do not claim archive format changes fix rollback mismatch. The logged `Fused 7 > Binary 8` is inconsistent with the stated binary-7 handset and must be checked against the exact screenshot/build before owner flashes.
+- GitHub Release per-asset size limit prevents attaching a multi-GB TAR as one file; Drive connector upload is limited to 100 MB. Fallback is numbered release attachments. 1.2 build/publication remains pending.
 
 ## D013 — Additive multi-variant ROM release assets; matching root manager stays separate
 
