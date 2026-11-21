@@ -2,6 +2,14 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 — Withdraw ROM 1.1 after reported first-device flash failure
+
+- Owner reported the first BakaSU ROM test failed with MD5 mismatch, LZ4 handling problem, and Odin write failure at `super.img`: `SW REV CHECK FAIL [super] Fused 7 > Binary 8` / `Complete(Write) operation failed.` Agent has not independently reproduced the flash.
+- Marked existing release `rom-v1.0` (display name 1.1 ROM Initial Build) as prerelease; retitled it **WITHDRAWN / DO NOT FLASH** and replaced release notes with an English failure notice. Verified all original 14 assets remain; no asset was deleted.
+- README now warns against all 1.1 variants, withdraws installation steps, and states the 1.2 package is pending exact firmware/rollback revision matching.
+- 1.2 packaging target from owner: one plain `.tar`, no MD5 footer, no LZ4-compressed members, no splitting. No corrected archive has been built.
+- Blockers: exact model and full current firmware/build/baseband and fused revision, matching binary-8 firmware/AP donor, and a host for the unsplit multi-GB tar (GitHub release per-asset limit may block attachment). No 1.2 release is claimed.
+
 ## 2026-11-18 — Prepare additive ROM variant publishing (builds not yet run)
 
 - User requested Vanilla (unrooted) and KernelSU-Next (rooted) AP packages added to the existing `rom-v1.0` release; the matching KSU-Next manager APK will be uploaded separately by the owner after AP publication.

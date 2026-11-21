@@ -83,6 +83,15 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Finding: on SM-A155F with an unlocked bootloader, stock `ril-daemon` hangs the modem after ~7h25m runtime (XDA 4688638/4703177); affects stock and GSIs (vendor RIL). No root-cause fix exists (Samsung/MTK side; even the A155F kernel devs report none).
 - Decision: ship a clean-room KernelSU/Magisk module (`rom/simfix/RILFix_A15`, method per rev.s; concept per itsfaris' RILFix_Faris.zip) that restarts ril-daemon every 6 h, embedded into the ROM at `/system/etc/a155f-extras/` and attached to the release. Default ROM kernel variant = `kernelsunext` because the module needs root; the `vanilla` package is documented as carrying **no** SIM fix.
 
+## D014 — Withdraw ROM 1.1 after first-device flash failures; 1.2 validation gate
+
+- Date: 2026-11-18
+- Status: **Accepted (owner-reported and directed)**.
+- Reported on-device outcome: 1.1 BakaSU package failed with MD5 mismatch and Odin write failure at `super.img`; exact log includes `SW REV CHECK FAIL [super] Fused 7 > Binary 8` and `Complete(Write) operation failed.` This is user evidence; the agent has not independently flashed/reproduced it.
+- Action: mark 1.1 / tag `rom-v1.0` as a prerelease, label it withdrawn / do not flash, retain all existing assets, and document the failure in English. This was completed.
+- 1.2 target packaging (owner-directed): one unsplit plain `.tar`, no MD5 footer, no LZ4-compressed members. Do not claim it fixes rollback mismatch until the exact device firmware/build and binary revision are verified and the matching donor firmware is used.
+- Blockers before building/publishing: exact model + full installed firmware/build/baseband and binary/bootloader revision; matching full firmware/AP donor; compatible hosting for a likely multi-gigabyte single tar (GitHub Release per-asset limit may prevent direct attachment). No 1.2 artifact is available yet.
+
 ## D013 — Additive multi-variant ROM release assets; matching root manager stays separate
 
 - Date: 2026-11-18
