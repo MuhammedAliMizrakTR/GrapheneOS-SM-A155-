@@ -6,19 +6,23 @@
 
 Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x)!!!.
 
-> ⚠️ **ROM 1.1 WITHDRAWN — DO NOT FLASH.** The first on-device trial of the BakaSU ROM reported an MD5 mismatch and an Odin write failure at `super.img`, with `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The 1.1 release has been moved to prerelease status and its assets are retained only for investigation. The other 1.1 variants are also not verified as flashable. Release 1.2 is not ready; it requires a matching bootloader/firmware revision and a rebuilt plain `.tar` (no MD5 footer, no LZ4-compressed members, no split parts).
+> ⚠️ **ROM 1.1 WITHDRAWN — DO NOT FLASH.** The first on-device trial of the BakaSU ROM reported an MD5 mismatch and an Odin write failure at `super.img`, with `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The 1.1 release is a prerelease and its assets are retained for investigation only. The other 1.1 variants are also not verified as flashable. A 1.2 BakaSU packaging-correction candidate is available as a prerelease, but the rollback-revision message is still unresolved; **do not flash until the exact device build and SW REV comparison are confirmed**.
 
 ---
 
 ---
 
-## 📱 ROM Release Status — 1.1 withdrawn; 1.2 verification rebuild pending
+## 📱 ROM Release Status — 1.1 withdrawn; 1.2 BakaSU candidate
 
 **Archived 1.1 release:** [rom-v1.0 — *1.1 ROM Initial Build* (prerelease; DO NOT FLASH)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)
 
-The first BakaSU ROM test on the maintainer's phone failed at the `super.img` write. The reported Odin log includes an MD5 mismatch and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`; this is not evidence that changing archive compression alone will fix the firmware rollback-revision mismatch. All 1.1 ROM assets are being retained for investigation, not recommended for installation. The 1.2 BakaSU package is being rebuilt only after the exact device firmware/build revision and a compatible donor image are confirmed.
+The first BakaSU ROM test on the maintainer's phone failed at the `super.img` write. The reported Odin log includes an MD5 mismatch and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`; changing archive compression alone cannot fix a firmware rollback-revision mismatch. All 1.1 assets are retained for investigation, not recommended for installation. The 1.2 candidate below corrects the requested container format but is **not device-verified**.
 
-The 1.2 package itself is **one plain `.tar`**: no appended MD5 footer and no LZ4-compressed members. If Google Drive cannot accept the multi-gigabyte file, the release may carry numbered transport chunks (`.00`, `.01`, …); joining them must reproduce the single TAR exactly. The error log's `Fused 7 > Binary 8` line still conflicts with the owner's stated CYG4 XSG / binary-7 handset baseline and must be reconciled before any flash.
+### 1.2 BakaSU packaging-correction candidate (prerelease)
+
+**Download:** [Release rom-v1.2 — 1.2 ROM Verification & Corruption Fix](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2). The AP is one plain `.tar`, with no MD5 footer and no LZ4-compressed image members. GitHub's per-file limit required five numbered transport chunks (`.00`–`.04`); join them in order to restore the single TAR. The SHA-256 manifest covers the complete TAR and each chunk.
+
+**Rollback warning:** the owner reports `A155FXXS7CYG4` XSG / binary 7, but the failed log says `Fused 7 > Binary 8`. These do not obviously agree. Do not flash until the exact full model/build and that SW REV line are confirmed against the donor firmware.
 
 ### Historical 1.1 package details (do not flash)
 
