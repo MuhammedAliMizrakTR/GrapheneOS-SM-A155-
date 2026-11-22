@@ -12,7 +12,7 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 
 ## 📱 ROM Release Status — 2.0 device-tested (owner report)
 
-**Previous releases:** [rom-v1.0 / 1.1 — withdrawn, DO NOT FLASH](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) and [rom-v1.2 — packaging-correction prerelease](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2) are retained for historical investigation. The maintainer has now provided photos showing the device reaching Android 17 / RestlessOS after installation. The maintainer reports the camera and flash work.
+**Download:** [RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v2.0) (prerelease; packages are being published as builds complete). Previous releases [rom-v1.0 / 1.1 — withdrawn, DO NOT FLASH](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) and [rom-v1.2 — packaging-correction prerelease](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2) remain for historical investigation. The maintainer supplied photos showing the device reaching Android 17 / RestlessOS and reports the camera and flash work.
 
 ### Version 2.0 — tested behavior and known limitations
 
@@ -22,7 +22,7 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 - **Auditor:** GrapheneOS Auditor is not expected to work: this is not an officially verified GrapheneOS device/build.
 - **GrapheneOS App Store:** updating the app may cause it to stop opening. If that happens, uninstall its updates / roll back its updates; the maintainer reports this restores it. Do not update it again until compatibility is confirmed.
 
-RestlessOS is an unofficial GrapheneOS-derived build, not an official GrapheneOS release. GrapheneOS security services, device verification and application compatibility must not be assumed. Version 2.0 denotes the updated project/readme status; do not infer that a new, separately published 2.0 binary exists unless linked in Releases.
+RestlessOS is an unofficial GrapheneOS-derived build, not an official GrapheneOS release. GrapheneOS security services, device verification and application compatibility must not be assumed. Version 2.0 is a date-stamped prerelease; use only the files listed on the linked release page and read the variant-specific notes before use.
 
 ### Historical 1.1 package details (do not flash)
 

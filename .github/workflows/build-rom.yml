@@ -201,8 +201,12 @@ jobs:
           done
           for f in RILFix_A15.zip BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk; do
             if [ -f "$f" ]; then
-              echo "uploading supplemental asset $f (no clobber)"
-              gh release upload "$RELEASE_TAG" "$f"
+              if gh release view "$RELEASE_TAG" --json assets --jq ".assets[].name" | grep -Fxq "$f"; then
+                echo "supplemental asset already present; retaining existing file: $f"
+              else
+                echo "uploading supplemental asset $f (no clobber)"
+                gh release upload "$RELEASE_TAG" "$f"
+              fi
             fi
           done
           echo "DONE: $(gh release view "$RELEASE_TAG" --json url --jq .url)"
