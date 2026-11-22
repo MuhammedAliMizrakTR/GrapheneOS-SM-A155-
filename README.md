@@ -12,7 +12,7 @@ Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaT
 
 ## 📱 ROM Release Status — 2.0 device-tested (owner report)
 
-**Download:** [RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v2.0) (prerelease; packages are being published as builds complete). Previous releases [rom-v1.0 / 1.1 — withdrawn, DO NOT FLASH](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) and [rom-v1.2 — packaging-correction prerelease](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2) remain for historical investigation. The maintainer supplied photos showing the device reaching Android 17 / RestlessOS and reports the camera and flash work.
+**Download:** [RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v2.0) (prerelease). The release contains BakaSU, KernelSU-Next, and unrooted Vanilla AP variants. The KernelSU-Next 33548 manager APK is not included, so that variant's root-manager setup is incomplete; do not use a mismatched manager. Previous releases [rom-v1.0 / 1.1 — withdrawn, DO NOT FLASH](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) and [rom-v1.2 — packaging-correction prerelease](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2) remain for historical investigation. The maintainer supplied photos showing the device reaching Android 17 / RestlessOS and reports the camera and flash work.
 
 ### Version 2.0 — tested behavior and known limitations
 

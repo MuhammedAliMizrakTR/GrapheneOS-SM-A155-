@@ -2,6 +2,13 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 — Publish date-stamped RestlessOS 17 v2.0 variant set
+
+- Created prerelease `rom-v2.0`, titled **RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)**, with BakaSU, KernelSU-Next, and unrooted Vanilla APs, each split into five plain-TAR transport parts with per-variant SHA-256 manifest. The archives have no appended MD5 footer and no LZ4-compressed members.
+- BakaSU build run `45007120405` succeeded. Vanilla `45007124112` and KernelSU-Next `45008835403` assembled and uploaded all AP parts/manifests, but their workflow jobs ended at the supplemental-asset step because common assets had already been uploaded by BakaSU. Confirmed all 20 release assets exist; no assets were overwritten.
+- BakaSU 35262 manager APK and RILFix are included. **KernelSU-Next 33548 manager APK remains unavailable**, so that variant's AP is published but manager setup is incomplete; README/release notes warn against using an unmatched manager.
+- Release notes include owner-reported boot/camera/flash and compatibility notes. No new device test was performed by the agent. Release is a prerelease/test build, not official GrapheneOS; preserve the SW REV warning.
+
 ## 2026-11-22 — Document owner-reported RestlessOS 17 boot test (project status 2.0)
 
 - Owner supplied photos showing the SM-A155F booting through Android 17 to the RestlessOS logo/home startup sequence after installation; owner reports successful boot, working camera, and working flash.
