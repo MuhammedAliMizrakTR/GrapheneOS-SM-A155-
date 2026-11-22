@@ -2,6 +2,14 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 — Add manual kernel/ROM rebuilds and Nothing OS port prompt
+
+- Added a manual-only kernel workflow for SM-A155F vanilla, BakaSU, and KernelSU-Next. `latest` checks out the selected upstream branch head; explicit refs pin a branch/tag/commit. Each run records the resolved source commit, produces an Odin TAR plus SHA-256 file, and publishes a unique dated prerelease without replacing existing assets.
+- Updated the manual ROM workflow to resolve the latest RestlessOS release when no tag is provided and to select the newest matching dated kernel release by variant, with the existing pinned v1.0 kernel as fallback. ROM builds require a unique destination release tag (`auto` creates a dated run tag), retain raw TAR/no-MD5/no-LZ4 packaging, and remain manual-only.
+- Added `docs/MANUAL_BUILDS.md` and updated README/ROM build docs with invocation, source-pinning, checksum, and rollback safety guidance.
+- Added a reusable Nothing OS–inspired SM-A155F port prompt with the user's no-overwrite, no-untested-flash, exact-model, firmware/rollback, licensing, provenance, and honest-claims constraints.
+- Validation: `bash -n`, PyYAML parsing of both workflow files, `git diff --check`, and a synthetic mocked test that fetched a dynamic kernel release, checked its SHA-256, and extracted `boot.img` passed. GitHub Actions were not dispatched; no build has been claimed or run for this change.
+
 ## 2026-11-18 — Publish date-stamped RestlessOS 17 v2.0 variant set
 
 - Created prerelease `rom-v2.0`, titled **RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)**, with BakaSU, KernelSU-Next, and unrooted Vanilla APs, each split into five plain-TAR transport parts with per-variant SHA-256 manifest. The archives have no appended MD5 footer and no LZ4-compressed members.

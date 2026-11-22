@@ -1,0 +1,164 @@
+name: Manual A155F kernel build (latest source → dated release)
+
+on:
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: Kernel flavor to build for SM-A155F
+        type: choice
+        options: [vanilla, bakasu, kernelsunext]
+        default: vanilla
+        required: true
+      source_ref:
+        description: Git branch, tag, or commit. Use latest to inspect the current variant branch head.
+        type: string
+        default: latest
+        required: true
+      force_rebuild:
+        description: Build even when the exact upstream commit already has a published kernel release
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manual-kernel-${{ inputs.variant }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build ${{ inputs.variant }} kernel
+    runs-on: ubuntu-22.04
+    timeout-minutes: 240
+    env:
+      VARIANT: ${{ inputs.variant }}
+      SOURCE_REF: ${{ inputs.source_ref }}
+      FORCE_REBUILD: ${{ inputs.force_rebuild }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/share/swift 2>/dev/null || true
+          df -h /
+
+      - name: Clone kernel source and resolve exact revision
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$VARIANT" in
+            vanilla) BRANCH=main; BUILD_FLAG=""; REPACK_FLAG="" ;;
+            bakasu) BRANCH=bakasu; BUILD_FLAG=--bakasu; REPACK_FLAG=--bakasu ;;
+            kernelsunext) BRANCH=kernelsunext; BUILD_FLAG=--ksun; REPACK_FLAG=--ksun ;;
+            *) echo "Unsupported variant: $VARIANT" >&2; exit 2 ;;
+          esac
+          git clone --filter=blob:none --no-checkout https://github.com/poqdavid/android_kernel_samsung_sma155f.git kernel-src
+          cd kernel-src
+          if [ "$SOURCE_REF" = latest ]; then
+            RESOLVED_REF="$BRANCH"
+          else
+            RESOLVED_REF="$SOURCE_REF"
+          fi
+          git fetch --depth=1 origin "$RESOLVED_REF"
+          git checkout --detach FETCH_HEAD
+          SOURCE_SHA=$(git rev-parse HEAD)
+          SHORT_SHA=${SOURCE_SHA:0:12}
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "build_flag=$BUILD_FLAG" >> "$GITHUB_OUTPUT"
+          echo "repack_flag=$REPACK_FLAG" >> "$GITHUB_OUTPUT"
+          SKIP=false
+          mkdir -p "$RUNNER_TEMP/previous-kernel"
+          PREVIOUS_TAG=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" --jq "[.[] | select(.tag_name | startswith(\"kernel-manual-${VARIANT}-\"))] | sort_by(.created_at) | last | .tag_name // empty")
+          if [ -n "$PREVIOUS_TAG" ] && gh release download "$PREVIOUS_TAG" --repo "$GITHUB_REPOSITORY" -p BUILD-INFO.txt -D "$RUNNER_TEMP/previous-kernel" >/dev/null 2>&1; then
+            PREVIOUS_SHA=$(sed -n 's/^source_commit=//p' "$RUNNER_TEMP/previous-kernel/BUILD-INFO.txt" | head -1)
+            if [ "$PREVIOUS_SHA" = "$SOURCE_SHA" ] && [ "$FORCE_REBUILD" != true ]; then
+              SKIP=true
+              echo "This exact upstream commit is already published at $PREVIOUS_TAG; skipping duplicate build."
+            fi
+          fi
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+          echo "Resolved $VARIANT from $RESOLVED_REF at $SOURCE_SHA"
+
+      - name: Report unchanged source
+        if: steps.source.outputs.skip == 'true'
+        run: |
+          echo "No newer source commit: existing dated kernel release already covers ${{ steps.source.outputs.source_sha }}. Set force_rebuild=true to build it again."
+
+      - name: Install kernel build dependencies
+        if: steps.source.outputs.skip != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            bc bison build-essential ccache ca-certificates clang curl flex \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi git libelf-dev libncurses-dev \
+            libssl-dev lld llvm make python3 rsync unzip wget zip zstd lz4
+
+      - name: Build kernel and Odin TAR
+        if: steps.source.outputs.skip != 'true'
+        working-directory: kernel-src
+        env:
+          OUT_DIR: ${{ github.workspace }}/kernel-src/out
+          DIST_DIR: ${{ github.workspace }}/kernel-src/out
+          ARCH: arm64
+          PLATFORM_VERSION: "12"
+          LTO: thin
+          CROSS_COMPILE: aarch64-linux-gnu-
+          CROSS_COMPILE_COMPAT: arm-linux-gnueabi-
+          LD: ld.lld
+          HOSTLD: ld.lld
+          AR: llvm-ar
+          NM: llvm-nm
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x ./build.sh ./scripts/repack
+          JOBS=$(nproc)
+          if [ -n "${{ steps.source.outputs.build_flag }}" ]; then
+            MAKEFLAGS="-j$JOBS" ./build.sh "${{ steps.source.outputs.build_flag }}" "-j $JOBS"
+            ./scripts/repack "${{ steps.source.outputs.repack_flag }}"
+          else
+            MAKEFLAGS="-j$JOBS" ./build.sh "-j $JOBS"
+            ./scripts/repack
+          fi
+          mapfile -t TARS < <(find release -maxdepth 1 -type f -name '*.tar' -print | sort)
+          if [ "${#TARS[@]}" -ne 1 ]; then
+            printf 'Expected exactly one release/*.tar; found %s\n' "${#TARS[@]}" >&2
+            printf '%s\n' "${TARS[@]}" >&2
+            exit 1
+          fi
+          mkdir -p "$GITHUB_WORKSPACE/publish"
+          OUT="a155f_kernel_${VARIANT}_${{ steps.source.outputs.short_sha }}.tar"
+          cp "${TARS[0]}" "$GITHUB_WORKSPACE/publish/$OUT"
+          (cd "$GITHUB_WORKSPACE/publish" && sha256sum "$OUT" > "$OUT.sha256")
+          {
+            echo "variant=$VARIANT"
+            echo "source_repository=https://github.com/poqdavid/android_kernel_samsung_sma155f"
+            echo "source_branch=${{ steps.source.outputs.branch }}"
+            echo "source_ref=$SOURCE_REF"
+            echo "source_commit=${{ steps.source.outputs.source_sha }}"
+            echo "built_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "device=Samsung Galaxy A15 4G (SM-A155F)"
+          } > "$GITHUB_WORKSPACE/publish/BUILD-INFO.txt"
+          tar -tf "$GITHUB_WORKSPACE/publish/$OUT" | sed -n '1,30p'
+          test -s "$GITHUB_WORKSPACE/publish/$OUT"
+          ls -lh "$GITHUB_WORKSPACE/publish"
+
+      - name: Publish checksummed build as a dated prerelease
+        if: steps.source.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          SHORT_SHA='${{ steps.source.outputs.short_sha }}'
+          DATE_STAMP=$(date -u +%Y%m%d)
+          TAG="kernel-manual-${VARIANT}-${DATE_STAMP}-${SHORT_SHA}-run${GITHUB_RUN_NUMBER}"
+          gh release create "$TAG" publish/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --prerelease \
+            --title "SM-A155F ${VARIANT} kernel — ${DATE_STAMP} — ${SHORT_SHA}" \
+            --notes "Manual kernel build from poqdavid/android_kernel_samsung_sma155f. Exact source commit, variant and SHA-256 are attached. Build-tested by CI only; not device-validated. Use the ROM workflow with kernel_release_tag=$TAG to consume this build."
+          echo "Published $TAG"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json url,assets --jq '{url,assets:[.assets[].name]}'

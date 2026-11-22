@@ -4,15 +4,13 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint (2026-11-18)
 
-**Project status 2.0:** date-stamped prerelease `rom-v2.0` is published with BakaSU, KernelSU-Next, and Vanilla AP packages. The owner reports a successful RestlessOS 17 boot and working camera/flash; photos were supplied. This is owner-reported testing, not independent validation. The KernelSU-Next 33548 manager APK is not included. Old 1.1 remains withdrawn; 1.2 remains historical prerelease. Known module/app compatibility warnings and firmware rollback gate are in README and release notes. Working branch: `arena/15d824a8-grapheneos-sm-a155`.
+**ROM status:** prerelease `rom-v2.0` contains BakaSU, KernelSU-Next and Vanilla AP packages. Owner reports successful RestlessOS 17 boot and working camera/flash; this is owner-reported, not independently verified. KernelSU-Next 33548 manager APK is not attached. ROM 1.1 stays withdrawn / DO NOT FLASH. Keep the firmware rollback warning: `Fused 7 > Binary 8` was reported despite the owner's binary-7 CYG4/XSG description.
 
-- User explicitly requests README in English to label 1.1 broken / do not flash, and 1.1 release to be prerelease. **Done:** release title/body updated; all 14 original assets retained. README carries the warning and withdraws install steps pending 1.2.
-- Owner clarified the handset is on `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in connected Drive. The corresponding 1.1 KernelSU-Next AP donor is already on `rom-v1.0`, checksum-manifested, and can be reused for a BakaSU candidate without a fresh multi-GB Drive download.
-- 1.2 package requirements met: one plain `.tar`, no MD5 footer, no LZ4-compressed members. GitHub delivery uses five numbered transport chunks (`.00`–`.04`) plus SHA-256 manifest because of per-asset limits.
-- Actions run `44918791595` succeeded. Release `rom-v1.2` is a prerelease with the chunks, SHA256 manifest, matching BakaSU 35262 APK, and RILFix module. Build packaging checks passed; this is **not device-verified**.
-- **Remaining safety clarification:** reported `Fused 7 > Binary 8` conflicts with the owner's binary-7 CYG4 statement. Do not advise flashing until exact model/build and the full Odin SW REV line are reconciled.
-- Earlier CI builds of BakaSU/KSN/Vanilla AP archives (Actions runs `44744378880`, `44748382860`) remain unverified; 1.1 assets are retained for investigation only.
-- No on-device retest or partition write has been performed by this agent.
+**Automation requested:** manual-only kernel and ROM rebuilds, no automatic update-triggered builds. Added `.github/workflows/build-kernel-manual.yml` to build from the current upstream variant branch or an explicit ref and publish a date-stamped SHA-256-checksummed prerelease. Updated `.github/workflows/build-rom.yml` to select latest RestlessOS release when ref is blank, and newest dated manual kernel release for the selected flavor (`latest`) with pinned v1.0 fallback. New ROM builds use unique auto tags and do not overwrite assets. Detailed instructions: `docs/MANUAL_BUILDS.md`.
+
+**Side quest:** `prompts/NOTHINGOS_SM-A155F_PORT_MASTER_PROMPT.md` is a reusable Turkish-context prompt for a Nothing OS-inspired SM-A155F feasibility/port project, including provenance, licensing, rollback, and no-overwrite red lines.
+
+Validation so far: shell syntax checks and a synthetic mocked test of the dynamic kernel-release fetch/checksum/extract path passed. The Actions workflow YAMLs have not yet run in GitHub. No new kernel or ROM build was triggered in this task. Working branch: `arena/b218b6db-grapheneos-sm-a155`.
 
 ## Historical checkpoint
 
