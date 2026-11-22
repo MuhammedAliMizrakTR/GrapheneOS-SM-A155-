@@ -2,6 +2,28 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-18 — Publish date-stamped RestlessOS 17 v2.0 variant set
+
+- Created prerelease `rom-v2.0`, titled **RestlessOS 17 — Galaxy A15 4G v2.0 (2026-11-18)**, with BakaSU, KernelSU-Next, and unrooted Vanilla APs, each split into five plain-TAR transport parts with per-variant SHA-256 manifest. The archives have no appended MD5 footer and no LZ4-compressed members.
+- BakaSU build run `45007120405` succeeded. Vanilla `45007124112` and KernelSU-Next `45008835403` assembled and uploaded all AP parts/manifests, but their workflow jobs ended at the supplemental-asset step because common assets had already been uploaded by BakaSU. Confirmed all 20 release assets exist; no assets were overwritten.
+- BakaSU 35262 manager APK and RILFix are included. **KernelSU-Next 33548 manager APK remains unavailable**, so that variant's AP is published but manager setup is incomplete; README/release notes warn against using an unmatched manager.
+- Release notes include owner-reported boot/camera/flash and compatibility notes. No new device test was performed by the agent. Release is a prerelease/test build, not official GrapheneOS; preserve the SW REV warning.
+
+## 2026-11-22 — Document owner-reported RestlessOS 17 boot test (project status 2.0)
+
+- Owner supplied photos showing the SM-A155F booting through Android 17 to the RestlessOS logo/home startup sequence after installation; owner reports successful boot, working camera, and working flash.
+- Added README compatibility notes: avoid NoMount/HybridMount and similar mount modules; YukiZygisk may bootloop; ZygiskNext and VectorLSP may cause bootloops/instability. These are owner-reported observations, not independent module tests.
+- Documented that GrapheneOS Auditor is not supported/verified on this unofficial build and that updating the GrapheneOS App Store may make it fail to open; owner reports rolling back the app updates restores it.
+- Clarified that “2.0” is the project documentation/status revision, not a claim that a new 2.0 binary release was published. No new ROM artifact was built in this documentation update.
+
+## 2026-11-18 — Withdraw ROM 1.1 after reported first-device flash failure
+
+- Owner reported the first BakaSU ROM test failed with MD5 mismatch, LZ4 handling problem, and Odin write failure at `super.img`: `SW REV CHECK FAIL [super] Fused 7 > Binary 8` / `Complete(Write) operation failed.` Agent has not independently reproduced the flash.
+- Marked existing release `rom-v1.0` (display name 1.1 ROM Initial Build) as prerelease; retitled it **WITHDRAWN / DO NOT FLASH** and replaced release notes with an English failure notice. Verified all original 14 assets remain; no asset was deleted.
+- README now warns against all 1.1 variants, withdraws installation steps, and states the 1.2 package is pending exact firmware/rollback revision matching.
+- Owner clarified their handset is `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in Drive; the checksum-verified 1.1 KSN AP donor can be reused as the exact CYG4 source. Requested 1.2 format: plain `.tar`, no appended MD5, no LZ4-compressed members. Owner allows numbered `.00`/`.01` transport chunks if a single Drive upload is unavailable.
+- The reported `Fused 7 > Binary 8` remains inconsistent with the stated binary-7 device; do not claim rollback compatibility or ask the user to flash until the exact Odin line/build is confirmed. GitHub release single-file limits and Drive connector's 100 MB upload cap require split release assets as fallback. No 1.2 build/release yet.
+
 ## 2026-11-18 — Prepare additive ROM variant publishing (builds not yet run)
 
 - User requested Vanilla (unrooted) and KernelSU-Next (rooted) AP packages added to the existing `rom-v1.0` release; the matching KSU-Next manager APK will be uploaded separately by the owner after AP publication.

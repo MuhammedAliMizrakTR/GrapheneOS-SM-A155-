@@ -4,15 +4,15 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint (2026-11-18)
 
-**All three ROM AP variants are now present in release `rom-v1.0` (display name 1.1 ROM Initial Build): original BakaSU, new KernelSU-Next 33548, and new Vanilla unrooted. README and release description have been updated with exact assets and installation/variant differences. No existing release assets were deleted or overwritten.** Working branch: `arena/31ec40b0-grapheneos-sm-a155`; PR #16 remains open.
+**Project status 2.0:** date-stamped prerelease `rom-v2.0` is published with BakaSU, KernelSU-Next, and Vanilla AP packages. The owner reports a successful RestlessOS 17 boot and working camera/flash; photos were supplied. This is owner-reported testing, not independent validation. The KernelSU-Next 33548 manager APK is not included. Old 1.1 remains withdrawn; 1.2 remains historical prerelease. Known module/app compatibility warnings and firmware rollback gate are in README and release notes. Working branch: `arena/15d824a8-grapheneos-sm-a155`.
 
-- Confirmed existing `rom-v1.0` assets before changes: three BakaSU AP split parts, `BakaSU_v4.2.0-rc3_35262-arm64-v8a-release.apk`, `RILFix_A15.zip`, and `SHA256SUMS.txt`. They remain present. KernelSU-Next 33548 AP three parts + variant manifest were added by Actions run `44744378880`; Vanilla AP three parts + variant manifest were added by run `44748382860`. Current release has 14 assets. Existing BakaSU assets and metadata were preserved; only release description was intentionally updated.
-- User requests two additional ROM packages: `vanilla` (unrooted) and `kernelsunext` (KernelSU-Next 33548); user will upload the matching KernelSU-Next manager APK separately at the end.
-- Workflow changes are being made to upload each variant's AP parts and unique checksum manifest only, without editing an existing release's body/status/title or overwriting any assets.
-- Manager APKs will not be embedded in future AP images. This avoids stale version mismatch; install the matching release APK separately. Vanilla has no root manager and no SIM-fix capability.
-- After both AP builds/assets are verified, update the release description and README with the variant matrix and accurate download/install steps. KernelSU-Next manager APK upload remains owner-deferred.
-- **Done:** KSN 33548 package built/published successfully (run `44744378880`); Vanilla package built/published from a checksum-verified KSN AP donor (run `44748382860`). Release description updated from `rom/combined-release-notes.md`; README now links every part/manifest and explains root/SIM-fix distinctions. Existing assets were retained.
-- **Pending:** owner-upload of the separate official-signature KernelSU-Next 33548 manager APK, as requested; device validation.
+- User explicitly requests README in English to label 1.1 broken / do not flash, and 1.1 release to be prerelease. **Done:** release title/body updated; all 14 original assets retained. README carries the warning and withdraws install steps pending 1.2.
+- Owner clarified the handset is on `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in connected Drive. The corresponding 1.1 KernelSU-Next AP donor is already on `rom-v1.0`, checksum-manifested, and can be reused for a BakaSU candidate without a fresh multi-GB Drive download.
+- 1.2 package requirements met: one plain `.tar`, no MD5 footer, no LZ4-compressed members. GitHub delivery uses five numbered transport chunks (`.00`–`.04`) plus SHA-256 manifest because of per-asset limits.
+- Actions run `44918791595` succeeded. Release `rom-v1.2` is a prerelease with the chunks, SHA256 manifest, matching BakaSU 35262 APK, and RILFix module. Build packaging checks passed; this is **not device-verified**.
+- **Remaining safety clarification:** reported `Fused 7 > Binary 8` conflicts with the owner's binary-7 CYG4 statement. Do not advise flashing until exact model/build and the full Odin SW REV line are reconciled.
+- Earlier CI builds of BakaSU/KSN/Vanilla AP archives (Actions runs `44744378880`, `44748382860`) remain unverified; 1.1 assets are retained for investigation only.
+- No on-device retest or partition write has been performed by this agent.
 
 ## Historical checkpoint
 

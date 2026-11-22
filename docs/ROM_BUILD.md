@@ -1,6 +1,8 @@
 # ROM build & packaging — RestlessOS 17 + v1.0 kernel → Odin AP (SM-A155F)
 
-Status: **CI-ready, first run pending. Nothing here is device-tested.**
+Status: **1.1 withdrawn after reported device flash failure. Do not run the old workflow for distribution. Release 1.2 is blocked on matching the device's exact binary/rollback firmware and confirming single-file hosting.**
+
+The 1.1 package was reported to fail with an MD5 mismatch, Odin write failure at `super.img`, and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The notes below describe the historical 1.1 pipeline only; its `.tar.md5` + LZ4 + split output is explicitly not the requested 1.2 format.
 
 ## Goal (owner-directed, 2026-11-19)
 
@@ -36,10 +38,10 @@ pipeline runs there:
 | 4 | `modify-gsi.sh` | embeds `/system/etc/a155f-extras/` (module zip, manager APK, README) into the GSI (ext4 mount or erofs repack) |
 | 5 | `repack-super.sh` + `lp_plan.py` | `lpdump`/`lpunpack` stock super, `lpmake` a new sparse super: **system = GSI**, vendor/product/odm/… = stock bytes, stock geometry preserved |
 | 6 | `make-vbmeta.sh` | `avbtool make_vbmeta_image --flags 3` for every `vbmeta*` member (the standard "vbmeta_disabled") |
-| 7 | `pack-ap.sh` | reassembles the AP tar with stock member names/order, md5-appends (`.tar.md5`), splits at 1900 MB for release-asset limits, writes SHA256SUMS |
-| 8 | `render-notes.sh` | bilingual release notes |
+| 7 | `pack-ap.sh` | reassembles one plain `.tar` with raw/uncompressed image members; no MD5 footer and no `.lz4` members. It may split the tar into numbered transport parts for release hosting; joining restores the exact TAR. Writes a manifest for the whole TAR and each part. |
+| 8 | `render-notes.sh` | English 1.2 test-candidate notes, including the firmware-revision gate |
 
-Outputs land on the selected GitHub release (`rom-v1.0` by default): split AP parts and a variant-specific `${APBASE}.SHA256SUMS.txt`. Publishing is additive: existing release title, description, status, and assets are not overwritten. Manager APKs are separate release assets so a stale or mismatched APK can never be silently embedded in a ROM.
+The 1.2 workflow targets `rom-v1.2` as a prerelease candidate. It only publishes numbered transport chunks plus a SHA-256 manifest (no `.tar.md5`, no LZ4). Existing releases/assets are never clobbered. Manager APKs remain separate assets.
 
 ## Toolchain (no apt needed)
 

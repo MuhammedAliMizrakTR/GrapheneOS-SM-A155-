@@ -83,6 +83,17 @@ Statuses: **Accepted requirement**, **Proposed**, **Deferred**, or **Rejected**.
 - Finding: on SM-A155F with an unlocked bootloader, stock `ril-daemon` hangs the modem after ~7h25m runtime (XDA 4688638/4703177); affects stock and GSIs (vendor RIL). No root-cause fix exists (Samsung/MTK side; even the A155F kernel devs report none).
 - Decision: ship a clean-room KernelSU/Magisk module (`rom/simfix/RILFix_A15`, method per rev.s; concept per itsfaris' RILFix_Faris.zip) that restarts ril-daemon every 6 h, embedded into the ROM at `/system/etc/a155f-extras/` and attached to the release. Default ROM kernel variant = `kernelsunext` because the module needs root; the `vanilla` package is documented as carrying **no** SIM fix.
 
+## D014 — Withdraw ROM 1.1 after first-device flash failures; 1.2 validation gate
+
+- Date: 2026-11-18
+- Status: **Accepted (owner-reported and directed)**.
+- Reported on-device outcome: 1.1 BakaSU package failed with MD5 mismatch and Odin write failure at `super.img`; exact log includes `SW REV CHECK FAIL [super] Fused 7 > Binary 8` and `Complete(Write) operation failed.` This is user evidence; the agent has not independently flashed/reproduced it.
+- Action: mark 1.1 / tag `rom-v1.0` as a prerelease, label it withdrawn / do not flash, retain all existing assets, and document the failure in English. This was completed.
+- Owner follow-up: handset is reported as `A155FXXS7CYG4` XSG / binary 7; matching full SamFW firmware ZIP is in connected Drive. A checksum-verified KSN AP donor exists on `rom-v1.0` and can be reused for a BakaSU rebuild.
+- 1.2 target packaging (owner-directed): plain `.tar`, no MD5 footer, no LZ4-compressed image members. Owner permits numbered transport chunks only if a single Drive upload is unavailable; joining them must restore exactly one TAR.
+- Do not claim archive format changes fix rollback mismatch. The logged `Fused 7 > Binary 8` is inconsistent with the stated binary-7 handset and must be checked against the exact screenshot/build before owner flashes.
+- GitHub Release per-asset size limit prevents attaching a multi-GB TAR as one file; Drive connector upload is limited to 100 MB. Fallback is numbered release attachments. 1.2 build/publication remains pending.
+
 ## D013 — Additive multi-variant ROM release assets; matching root manager stays separate
 
 - Date: 2026-11-18
