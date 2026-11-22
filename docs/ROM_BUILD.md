@@ -1,8 +1,8 @@
 # ROM build & packaging — RestlessOS 17 + v1.0 kernel → Odin AP (SM-A155F)
 
-Status: **1.1 withdrawn after reported device flash failure. Do not run the old workflow for distribution. Release 1.2 is blocked on matching the device's exact binary/rollback firmware and confirming single-file hosting.**
+Status: **Historical build documentation.** ROM 1.1 was withdrawn after the reported flash failure. Current manual kernel/ROM rebuild instructions are in [MANUAL_BUILDS.md](MANUAL_BUILDS.md); current release status is in the README. All candidate packages remain prereleases and require firmware/rollback compatibility checks before use.
 
-The 1.1 package was reported to fail with an MD5 mismatch, Odin write failure at `super.img`, and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The notes below describe the historical 1.1 pipeline only; its `.tar.md5` + LZ4 + split output is explicitly not the requested 1.2 format.
+The 1.1 package was reported to fail with an MD5 mismatch, Odin write failure at `super.img`, and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The sections below preserve historical pipeline context; do not use historical `.tar.md5`/LZ4 packages as current builds.
 
 ## Goal (owner-directed, 2026-11-19)
 

@@ -2,8 +2,9 @@
 # Fetches the three ROM inputs, one phase per invocation (or "all"):
 #   fetch-inputs.sh kernel|gsi|firmware|ap-base|all
 #
-# NO kernel rebuild: the exact v1.0 release artifact is verified against the
-# pinned round-2 SHA-256.
+# Kernel source selection: KERNEL_RELEASE_TAG=latest uses the newest dated
+# manual kernel release for this variant (asset manifest SHA-256 verified);
+# if none exists, the pinned v1.0 asset/hash is the safe fallback.
 #
 # Two modes:
 #   CI mode (default): downloads via gh (releases) + samloader (Samsung FUS).
@@ -28,22 +29,38 @@ esac
 
 do_kernel() {
   echo "=== kernel: $KTAR ==="
+  KREPO="${GITHUB_REPOSITORY:-MuhammedAliMizrakTR/GrapheneOS-SM-A155-}"
+  KERNEL_TAG="${KERNEL_RELEASE_TAG:-v1.0}"
+  if [ "$KERNEL_TAG" = latest ]; then
+    KERNEL_TAG=$(gh api "repos/$KREPO/releases?per_page=100" --jq "[.[] | select(.tag_name | startswith(\"kernel-manual-${KERNEL_VARIANT}-\"))] | sort_by(.created_at) | last | .tag_name // empty")
+    if [ -z "$KERNEL_TAG" ]; then
+      echo "No dated manual kernel release found; falling back to pinned v1.0 artifact."
+      KERNEL_TAG=v1.0
+    fi
+  fi
   if [ -n "${INPUTS_DIR:-}" ]; then
     cp "$INPUTS_DIR/$KTAR" work/kernel/
+    echo "$KSHA  work/kernel/$KTAR" | sha256sum -c -
   elif [ -n "${KERNEL_URL:-}" ]; then
     # Direct-URL mode (e.g. public Google Drive link on a runner that can
     # reach Google). Sha256 below is still the hard gate.
     echo "KERNEL_URL mode: $KERNEL_URL"
     curl -fL --retry 3 -o "work/kernel/$KTAR" "$KERNEL_URL"
+    echo "$KSHA  work/kernel/$KTAR" | sha256sum -c -
+  elif [ "$KERNEL_TAG" != v1.0 ]; then
+    AVAIL=$(gh release view "$KERNEL_TAG" -R "$KREPO" --json assets --jq '.assets[].name')
+    SEL=$(printf '%s\n' "$AVAIL" | grep -E "^a155f_kernel_${KERNEL_VARIANT}_.+\\.tar$" | head -1 || true)
+    [ -n "$SEL" ] || { echo "FATAL: no manual ${KERNEL_VARIANT} kernel TAR in release $KERNEL_TAG"; exit 1; }
+    gh release download "$KERNEL_TAG" -R "$KREPO" -p "$SEL" -D work/kernel --clobber
+    gh release download "$KERNEL_TAG" -R "$KREPO" -p "$SEL.sha256" -D work/kernel --clobber
+    ( cd work/kernel && sha256sum -c "$SEL.sha256" )
+    KTAR="$SEL"
+    echo "kernel integrity: OK (manifest from $KERNEL_TAG)"
   else
-    KREPO="${GITHUB_REPOSITORY:-MuhammedAliMizrakTR/GrapheneOS-SM-A155-}"
-    # Diagnose first: log every asset on the release, then match loosely.
-    # (Exact -p match fails hard if the uploaded name differs even slightly
-    #  from the Drive filename we pinned.)
+    # The original v1.0 kernel asset remains a pinned fallback.
     AVAIL=$(gh release view v1.0 -R "$KREPO" --json assets --jq '.assets[].name' || true)
     echo "release v1.0 assets on $KREPO:"
     echo "$AVAIL" | sed 's/^/  - /'
-    # Prefer exact name; fall back to variant-prefixed .tar match.
     SEL="$KTAR"
     if ! printf '%s\n' "$AVAIL" | grep -qx "$KTAR"; then
       SEL=$(printf '%s\n' "$AVAIL" | grep -i "^${KERNEL_VARIANT}.*\\.tar\$" | head -1 || true)
@@ -52,9 +69,9 @@ do_kernel() {
     [ -n "$SEL" ] || { echo "FATAL: no ${KERNEL_VARIANT}*.tar asset on release v1.0"; exit 1; }
     gh release download v1.0 -R "$KREPO" -p "$SEL" -D work/kernel --clobber
     [ "$SEL" = "$KTAR" ] || mv "work/kernel/$SEL" "work/kernel/$KTAR"
+    echo "$KSHA  work/kernel/$KTAR" | sha256sum -c -
+    echo "kernel integrity: OK (pinned v1.0 hash)"
   fi
-  echo "$KSHA  work/kernel/$KTAR" | sha256sum -c -
-  echo "kernel integrity: OK (round-2 pinned hash)"
   BOOT_MEMBER=$( { tar -tf "work/kernel/$KTAR" || true; } | grep -m1 -E '(^|/)boot\.img$' || true)
   [ -n "$BOOT_MEMBER" ] || BOOT_MEMBER=$( { tar -tf "work/kernel/$KTAR" || true; } | grep -m1 '\.img$' || true)
   [ -n "$BOOT_MEMBER" ] || { echo "FATAL: no .img member in $KTAR; first members:"; { tar -tf "work/kernel/$KTAR" || true; } | head -20; exit 1; }

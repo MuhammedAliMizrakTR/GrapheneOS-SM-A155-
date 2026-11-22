@@ -44,7 +44,7 @@ The attempted 1.1 bundle paired **RestlessOS 17** (Android 17, unofficial Graphe
 
 **Archived assets only:** the linked rows below identify the 1.1 files for troubleshooting. They are marked **DO NOT FLASH**; their checksum manifests do not establish that the package is compatible with the device's fused binary revision.
 
-**Installation:** 1.1 installation steps are intentionally withdrawn. Do not join or flash these files. Release 1.2 instructions will be published only after a firmware-revision-matched package is built and reviewed.
+**Installation:** 1.1 files remain withdrawn and must not be joined or flashed. For current v2.0 prerelease asset details and the owner-reported device test, use the [rom-v2.0 release notes](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v2.0). Follow the firmware/rollback warning there; never proceed when Odin reports a revision mismatch.
 
 ## 🔧 Kernels — v1.0 Initial Build
 
@@ -98,7 +98,7 @@ The matching manager APK is a **separate asset on the ROM release** (see [rom-v1
 
 ### 📦 One-package install (no fastbootd)
 
-The ROM ships as a **single Odin AP package** built by CI (`.github/workflows/build-rom.yml`): RestlessOS as `system` inside a rebuilt `super`, the **v1.0 kernel** (pulled from Release v1.0, SHA-256-pinned), the **stock CYG4 driver stack** (vendor/product/odm carried byte-identical), disabled `vbmeta`, and an **embedded SIM-drop fix** module (`/system/etc/a155f-extras/RILFix_A15.zip`, rooted variants). Install: flash stock **A155FXXS7CYG4** (any region) → flash our AP package → format data. Full story: [docs/ROM_BUILD.md](docs/ROM_BUILD.md). Status: **CI-ready, not device-tested.**
+The ROM AP is built manually by [GitHub Actions](.github/workflows/build-rom.yml): RestlessOS `system` inside a rebuilt `super`, a selected variant kernel (latest dated manual build, SHA-256 verified, or pinned v1.0 fallback), the selected stock donor driver stack, disabled `vbmeta`, and the rooted-variant SIM-fix module. Builds are plain TARs with numbered transport chunks when hosting limits require them. CI success is not device validation; firmware/rollback and owner-reported known issues remain important. See [manual build instructions](docs/MANUAL_BUILDS.md) and the historical [ROM build notes](docs/ROM_BUILD.md).
 
 ---
 
@@ -119,6 +119,8 @@ The ROM ships as a **single Odin AP package** built by CI (`.github/workflows/bu
 | [docs/RESEARCH.md](docs/RESEARCH.md) | Source research & provenance |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Phases and acceptance gates |
 | [docs/DEVICE_INVENTORY.md](docs/DEVICE_INVENTORY.md) | Read-only device data collection |
+| [docs/MANUAL_BUILDS.md](docs/MANUAL_BUILDS.md) | Manual kernel/ROM GitHub Actions and update-selection guide |
+| [prompts/NOTHINGOS_SM-A155F_PORT_MASTER_PROMPT.md](prompts/NOTHINGOS_SM-A155F_PORT_MASTER_PROMPT.md) | Copy/paste feasibility and porting prompt for a Nothing OS-inspired A15 4G project |
 | [AGENTS.md](AGENTS.md) | Contribution/checkpoint protocol |
 
 ## ⚖️ License & credits

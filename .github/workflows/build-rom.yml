@@ -1,9 +1,8 @@
-name: Build A155F ROM (RestlessOS 17 + v1.0 kernel → Odin AP)
+name: Build A155F ROM (RestlessOS 17 + selected kernel → plain AP TAR)
 
-# Legacy workflow now produces the 1.2 BakaSU candidate format:
-#   verified CYG4 AP donor + RestlessOS 17 GSI + v1.0 kernel
-#   → plain TAR (no appended MD5, no LZ4 members), optionally transport-split
-#     for GitHub's per-asset limit. Join chunks to restore one TAR.
+# Manual ROM rebuild: latest/pinned RestlessOS GSI + verified AP donor + selected
+# variant kernel (latest manual kernel release or pinned v1.0 fallback) → plain TAR
+# with raw members, SHA-256 manifest and numbered transport chunks when needed.
 #
 # See docs/ROM_BUILD.md for architecture and user flashing guide.
 
@@ -11,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       kernel_variant:
-        description: "v1.0 kernel variant (SIM-fix module needs a rooted one; vanilla = no RIL fix)"
+        description: "Kernel flavor to package (latest dated manual kernel or pinned v1.0 fallback)"
         type: choice
         options:
           - bakasu
@@ -33,22 +32,26 @@ on:
         required: true
       fw_region:
         description: "Samsung region/CSC code for the FUS download"
-        default: "TUR"
+        default: "XSG"
         required: true
       fw_url:
         description: "Optional: direct URL of the stock firmware zip (bypasses Samsung FUS, e.g. link-shared Drive file)"
         default: ""
         required: false
       restless_ref:
-        description: "treble_restlessos release tag (empty = latest)"
+        description: "treble_restlessos release tag (empty = latest release)"
         default: ""
+      kernel_release_tag:
+        description: "Kernel asset release tag; latest resolves the newest dated manual kernel build (falls back to pinned v1.0)"
+        default: "latest"
+        required: true
       ap_base_release_tag:
         description: "Existing release tag containing the checksum-verified AP donor"
         default: "rom-v1.0"
         required: true
       release_tag:
-        description: "Tag of the 1.2 prerelease that receives the transport parts"
-        default: "rom-v1.2"
+        description: "Use auto for a unique dated tag, or provide a new unused tag; existing assets are never overwritten"
+        default: "auto"
         required: true
 
 permissions:
@@ -57,6 +60,7 @@ permissions:
 
 concurrency:
   group: rom-build
+  cancel-in-progress: false
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,6 +71,7 @@ env:
   FW_REGION: ${{ inputs.fw_region }}
   FW_URL: ${{ inputs.fw_url }}
   RESTLESS_REF: ${{ inputs.restless_ref }}
+  KERNEL_RELEASE_TAG: ${{ inputs.kernel_release_tag }}
   RELEASE_TAG: ${{ inputs.release_tag }}
 
 jobs:
@@ -76,6 +81,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve unique release tag
+        shell: bash
+        run: |
+          if [ "$RELEASE_TAG" = auto ]; then
+            echo "RELEASE_TAG=rom-v2.0-$(date -u +%Y%m%d)-run${GITHUB_RUN_NUMBER}" >> "$GITHUB_ENV"
+          fi
 
       - name: Free disk space
         run: |
@@ -111,7 +123,7 @@ jobs:
           (command -v lpdump || command -v lpdumps)
           test -f tools/avb/avbtool.py && echo "avbtool OK"
 
-      - name: Fetch kernel — v1.0 artifact (sha256-pinned)
+      - name: Fetch selected kernel release (SHA-256 verified; latest or v1.0 fallback)
         run: |
           mkdir -p work
           set -o pipefail
@@ -184,8 +196,8 @@ jobs:
           # The owner maintains the combined release description after all variants are ready.
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --prerelease \
-              --title "1.2 ROM Verification & Corruption Fix — BakaSU (Odin AP candidate)" \
-              --notes "Verification candidate. See repository README. Device/rollback compatibility still requires owner testing."
+              --title "RestlessOS 17 SM-A155F ROM — ${KERNEL_VARIANT} — $(date -u +%Y-%m-%d)" \
+              --notes "Manually built test candidate. See README and CI summary. This is not official GrapheneOS and is not a device-compatibility guarantee."
           fi
           cd dist
           RTAG=$(cat ../../work/gsi/TAG)
