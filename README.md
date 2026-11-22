@@ -6,23 +6,23 @@
 
 Device-specific software for the **Samsung Galaxy A15 4G (SM-A155F)** — MediaTek **Helio G99 (MT6789)**, Linux 5.10 GKI. **Not** for the A15 5G (SM-A156x)!!!.
 
-> ⚠️ **ROM 1.1 WITHDRAWN — DO NOT FLASH.** The first on-device trial of the BakaSU ROM reported an MD5 mismatch and an Odin write failure at `super.img`, with `SW REV CHECK FAIL [super] Fused 7 > Binary 8`. The 1.1 release is a prerelease and its assets are retained for investigation only. The other 1.1 variants are also not verified as flashable. A 1.2 BakaSU packaging-correction candidate is available as a prerelease, but the rollback-revision message is still unresolved; **do not flash until the exact device build and SW REV comparison are confirmed**.
+> **Device test update — version 2.0:** The maintainer reports that the phone booted successfully into RestlessOS 17 after installation. Camera and flash are reported working. See the compatibility and known-issues notes below. This is an owner-reported test, not independent verification.
 
 ---
 
----
+## 📱 ROM Release Status — 2.0 device-tested (owner report)
 
-## 📱 ROM Release Status — 1.1 withdrawn; 1.2 BakaSU candidate
+**Previous releases:** [rom-v1.0 / 1.1 — withdrawn, DO NOT FLASH](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0) and [rom-v1.2 — packaging-correction prerelease](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2) are retained for historical investigation. The maintainer has now provided photos showing the device reaching Android 17 / RestlessOS after installation. The maintainer reports the camera and flash work.
 
-**Archived 1.1 release:** [rom-v1.0 — *1.1 ROM Initial Build* (prerelease; DO NOT FLASH)](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.0)
+### Version 2.0 — tested behavior and known limitations
 
-The first BakaSU ROM test on the maintainer's phone failed at the `super.img` write. The reported Odin log includes an MD5 mismatch and `SW REV CHECK FAIL [super] Fused 7 > Binary 8`; changing archive compression alone cannot fix a firmware rollback-revision mismatch. All 1.1 assets are retained for investigation, not recommended for installation. The 1.2 candidate below corrects the requested container format but is **not device-verified**.
+- **Boot:** successful boot to RestlessOS 17 reported by the maintainer (photos supplied). This does not establish broad compatibility or guarantee other devices/builds will boot.
+- **Camera and flash:** reported working.
+- **Root modules:** avoid **NoMount**, **HybridMount**, and similar mount-overlay modules; they may cause bootloops. Kernel-level modules such as **YukiZygisk** may also cause bootloops. **ZygiskNext** and **VectorLSP** are reported incompatible or unstable on this hardened system and may cause bootloops or other instability. These are owner-reported compatibility findings; use no such modules unless independently confirmed for this build.
+- **Auditor:** GrapheneOS Auditor is not expected to work: this is not an officially verified GrapheneOS device/build.
+- **GrapheneOS App Store:** updating the app may cause it to stop opening. If that happens, uninstall its updates / roll back its updates; the maintainer reports this restores it. Do not update it again until compatibility is confirmed.
 
-### 1.2 BakaSU packaging-correction candidate (prerelease)
-
-**Download:** [Release rom-v1.2 — 1.2 ROM Verification & Corruption Fix](https://github.com/MuhammedAliMizrakTR/GrapheneOS-SM-A155-/releases/tag/rom-v1.2). The AP is one plain `.tar`, with no MD5 footer and no LZ4-compressed image members. GitHub's per-file limit required five numbered transport chunks (`.00`–`.04`); join them in order to restore the single TAR. The SHA-256 manifest covers the complete TAR and each chunk.
-
-**Rollback warning:** the owner reports `A155FXXS7CYG4` XSG / binary 7, but the failed log says `Fused 7 > Binary 8`. These do not obviously agree. Do not flash until the exact full model/build and that SW REV line are confirmed against the donor firmware.
+RestlessOS is an unofficial GrapheneOS-derived build, not an official GrapheneOS release. GrapheneOS security services, device verification and application compatibility must not be assumed. Version 2.0 denotes the updated project/readme status; do not infer that a new, separately published 2.0 binary exists unless linked in Releases.
 
 ### Historical 1.1 package details (do not flash)
 

@@ -4,7 +4,7 @@ Last documentation update: **2026-11-18 — Europe/Istanbul**.
 
 ## Current checkpoint (2026-11-18)
 
-**1.1 ROM release `rom-v1.0` is withdrawn/prerelease. A 1.2 BakaSU packaging-correction candidate has been built and published as prerelease `rom-v1.2`.** It is one plain TAR (no MD5 footer, no LZ4 members), carried as five numbered transport chunks plus SHA256 manifest. It is not device-verified and must not be flashed until the reported SW REV discrepancy is reconciled. Working branch: `arena/15d824a8-grapheneos-sm-a155`.
+**Project status 2.0 (2026-11-22): owner reports successful boot of RestlessOS 17 on SM-A155F, with camera and flash working.** Photos supplied show the phone booting Android 17 and RestlessOS. This is owner-reported device testing, not independent validation. Known module/app compatibility warnings are in README. Old 1.1 remains withdrawn; 1.2 remains a prerelease packaging candidate. No distinct 2.0 binary has been built or published. Working branch: `arena/15d824a8-grapheneos-sm-a155`.
 
 - User explicitly requests README in English to label 1.1 broken / do not flash, and 1.1 release to be prerelease. **Done:** release title/body updated; all 14 original assets retained. README carries the warning and withdraws install steps pending 1.2.
 - Owner clarified the handset is on `A155FXXS7CYG4` XSG / binary 7 and the matching full SamFW ZIP is in connected Drive. The corresponding 1.1 KernelSU-Next AP donor is already on `rom-v1.0`, checksum-manifested, and can be reused for a BakaSU candidate without a fresh multi-GB Drive download.

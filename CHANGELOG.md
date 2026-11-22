@@ -2,6 +2,13 @@
 
 This file records meaningful changes and validation outcomes. Entries are not proof of a GitHub push; confirm the remote commit separately.
 
+## 2026-11-22 — Document owner-reported RestlessOS 17 boot test (project status 2.0)
+
+- Owner supplied photos showing the SM-A155F booting through Android 17 to the RestlessOS logo/home startup sequence after installation; owner reports successful boot, working camera, and working flash.
+- Added README compatibility notes: avoid NoMount/HybridMount and similar mount modules; YukiZygisk may bootloop; ZygiskNext and VectorLSP may cause bootloops/instability. These are owner-reported observations, not independent module tests.
+- Documented that GrapheneOS Auditor is not supported/verified on this unofficial build and that updating the GrapheneOS App Store may make it fail to open; owner reports rolling back the app updates restores it.
+- Clarified that “2.0” is the project documentation/status revision, not a claim that a new 2.0 binary release was published. No new ROM artifact was built in this documentation update.
+
 ## 2026-11-18 — Withdraw ROM 1.1 after reported first-device flash failure
 
 - Owner reported the first BakaSU ROM test failed with MD5 mismatch, LZ4 handling problem, and Odin write failure at `super.img`: `SW REV CHECK FAIL [super] Fused 7 > Binary 8` / `Complete(Write) operation failed.` Agent has not independently reproduced the flash.
